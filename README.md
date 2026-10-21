@@ -119,57 +119,53 @@ La página `/creditos` se genera sola a partir de `credits.ts`.
 
 ---
 
-## 5. Despliegue en Cloudflare Pages
+## 5. Despliegue en Cloudflare
 
-La web es 100 % estática: el resultado de `npm run build` es la carpeta `dist/`.
+La web es 100 % estática: el resultado de `npm run build` es la carpeta `dist/`. Cloudflare la sirve como **Worker con archivos estáticos** (el sucesor de Cloudflare Pages), según `wrangler.jsonc`.
 
-### Opción A — conectando un repositorio de GitHub (recomendada)
+### Opción A — conectando el repositorio de GitHub (recomendada)
 
-1. Crea un repositorio en GitHub y sube el proyecto:
-   ```bash
-   git remote add origin git@github.com:USUARIO/osuna-visitas.git
-   git push -u origin main
-   ```
-2. En el panel de Cloudflare: **Workers & Pages → Create → Pages → Connect to Git** y elige el repositorio.
-3. Configuración de build:
-   - *Framework preset*: **Astro**
+1. En el panel de Cloudflare: **Workers & Pages → Create → Import a repository** y elige `pedrosc10/turismo-osuna-web`.
+2. Configuración:
+   - *Project name*: `turismo-osuna-web` (debe coincidir con `name` en `wrangler.jsonc`)
    - *Build command*: `npm run build`
-   - *Build output directory*: `dist`
-4. **Environment variables** (en *Settings → Variables and Secrets*, para *Production* y *Preview*):
+   - *Deploy command*: `npx wrangler deploy`
+   - *Non-production branch deploy command*: `npx wrangler versions upload`
+   - *Path*: `/`
+3. **Variables de build** (*Settings → Build → Variables and secrets*; son de **build**, no de runtime):
    - `NODE_VERSION` = `24`
-   - `SITE_URL` = `https://<nombre-del-proyecto>.pages.dev` (o el dominio definitivo)
-   - `PUBLIC_CF_ANALYTICS_TOKEN` = *(ver apartado de analítica; puede quedar vacío)*
-5. **Save and Deploy**. Cada `git push` a `main` publica en producción; las demás ramas generan una URL de vista previa.
+   - `SITE_URL` = la URL pública (al principio, la `https://turismo-osuna-web.<tu-subdominio>.workers.dev` que te asigne Cloudflare; luego, el dominio)
+   - `PUBLIC_CF_ANALYTICS_TOKEN` = *(opcional, ver analítica)*
+4. Cada `git push` a `main` publica en producción; las demás ramas suben una versión de vista previa con su propia URL.
 
-### Opción B — con Wrangler (sin GitHub)
+### Opción B — desde la terminal con Wrangler
 
 ```bash
 npm run build
 npx wrangler login
-npx wrangler pages project create osuna-visitas --production-branch=main
-npx wrangler pages deploy dist --project-name=osuna-visitas
+npx wrangler deploy
 ```
 
-Antes del `build`, define `SITE_URL` en `.env` con la URL que te asigne Cloudflare.
+Antes del `build`, define `SITE_URL` en `.env`.
 
 ### Cabeceras y 404
 
 - `public/_headers` añade cabeceras de seguridad y caché larga para `/_astro/*`.
-- Cloudflare Pages sirve el `404.html` más cercano a la URL pedida: `/en/…` y `/de/…` muestran su 404 traducido.
+- Con `not_found_handling: "404-page"` (en `wrangler.jsonc`), Cloudflare sirve el `404.html` más cercano a la URL pedida: `/en/…` y `/de/…` muestran su 404 traducido.
 
 ### Configurar el dominio cuando lo haya
 
-1. En el proyecto de Pages: **Custom domains → Set up a custom domain** e introduce, por ejemplo, `visitasosuna.es` y `www.visitasosuna.es`.
-2. Si el dominio ya está en Cloudflare, los registros DNS se crean solos. Si está en otro proveedor, crea un **CNAME** de `www` apuntando a `<proyecto>.pages.dev` (y, para el dominio raíz, mueve los DNS a Cloudflare o usa la redirección que indique el panel).
+1. En el proyecto: **Settings → Domains & Routes → Add → Custom domain** e introduce, por ejemplo, `visitasosuna.es` y `www.visitasosuna.es`.
+2. El dominio tiene que estar gestionado por Cloudflare (cambia los DNS del registrador a los que te indique Cloudflare); los registros se crean solos.
 3. Cambia la variable `SITE_URL` al dominio definitivo (con `https://`, sin barra final) y vuelve a desplegar (*Deployments → Retry deployment* o un nuevo `git push`). Así se actualizan canonical, hreflang, sitemap, `robots.txt` y Open Graph.
-4. Opcional: en *Rules → Redirect Rules* redirige `*.pages.dev` y `www` al dominio principal.
+4. Opcional: en *Rules → Redirect Rules* redirige `www` al dominio principal, y desactiva la URL `workers.dev` en *Settings → Domains & Routes*.
 5. Da de alta el sitemap (`https://dominio/sitemap-index.xml`) en Google Search Console y Bing Webmaster Tools.
 
 ### Activar Cloudflare Web Analytics (sin cookies)
 
 Hay dos formas; usa **solo una** para no contar doble:
 
-- **Automática** (más sencilla): en el proyecto de Pages, *Metrics → Web Analytics → Enable*. Cloudflare inyecta el script él mismo. Deja `PUBLIC_CF_ANALYTICS_TOKEN` vacío.
+- **Automática** (solo con dominio propio en Cloudflare): en *Analytics & Logs → Web Analytics → Add a site*, elige el dominio y activa la inyección automática. Deja `PUBLIC_CF_ANALYTICS_TOKEN` vacío.
 - **Con token**: en el panel de Cloudflare, *Analytics & Logs → Web Analytics → Add a site*, introduce el dominio y copia el **token** del fragmento que te muestra (`"token": "…"`). Ponlo en la variable `PUBLIC_CF_ANALYTICS_TOKEN` y vuelve a desplegar. La web solo carga el script si el token no está vacío y en producción.
 
 Cloudflare Web Analytics no usa cookies ni identificadores persistentes, por eso no hace falta banner (ver la política de cookies).

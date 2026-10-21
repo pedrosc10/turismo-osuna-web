@@ -1,0 +1,15 @@
+// Configuración de Cloudflare (Workers con archivos estáticos).
+// La web es 100 % estática: Cloudflare sirve la carpeta dist/ que genera `npm run build`.
+// El nombre debe coincidir con el del proyecto creado en el panel de Cloudflare.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "turismo-osuna-web",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./dist",
+    // Sirve el 404.html más cercano: /en/… y /de/… muestran su 404 traducido
+    "not_found_handling": "404-page",
+    // URLs con barra final (/creditos/), como genera Astro
+    "html_handling": "auto-trailing-slash"
+  }
+}
