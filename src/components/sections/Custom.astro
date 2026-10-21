@@ -1,0 +1,145 @@
+---
+import Photo from '../Photo.astro';
+import Icon from '../Icon.astro';
+import Azulejo from '../Azulejo.astro';
+import { t, asLocale } from '../../i18n';
+import { whatsappUrl } from '../../data/site';
+
+const tr = t(asLocale(Astro.currentLocale));
+const c = tr.custom;
+---
+
+<section id="a-medida" class="custom" aria-labelledby="a-medida-title">
+  <figure class="custom__band">
+    <Photo
+      name="vista-panoramica"
+      alt={tr.alt['vista-panoramica']}
+      sizes="100vw"
+      widths={[640, 960, 1440, 2000, 2400]}
+      pictureClass="custom__picture"
+      class="custom__img"
+    />
+    <figcaption class="wrap fig">{c.caption}</figcaption>
+  </figure>
+
+  <div class="custom__panel">
+    <Azulejo id="az-custom" />
+    <div class="wrap grid custom__grid">
+      <div class="custom__head">
+        <p class="kicker"><span class="num">03</span> {c.kicker}</p>
+        <h2 id="a-medida-title">{c.title}</h2>
+      </div>
+      <div class="custom__body">
+        <p class="lead">{c.text}</p>
+        <ul class="custom__list">
+          {
+            c.audiences.map((a) => (
+              <li>
+                <h3>{a.t}</h3>
+                <p>{a.d}</p>
+              </li>
+            ))
+          }
+        </ul>
+        <a class="btn custom__cta" href={whatsappUrl(tr.wa.custom)} target="_blank" rel="noopener">
+          <Icon name="whatsapp" />
+          {c.cta}
+          <span class="visually-hidden">{tr.cta.newTab}</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .custom {
+    padding-bottom: 0;
+  }
+  .custom__band :global(.custom__picture) {
+    display: block;
+    aspect-ratio: 16 / 9;
+  }
+  .custom__band :global(.custom__img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 40% 50%;
+  }
+  .custom__band .fig {
+    margin-bottom: 0;
+  }
+  .custom__panel {
+    --az-bg: var(--stone-2);
+    --az-star: var(--terra);
+    --az-corner: var(--olive);
+    background: var(--stone-2);
+    margin-top: 32px;
+    padding-bottom: 72px;
+  }
+  .custom__grid {
+    padding-top: 48px;
+    row-gap: 24px;
+  }
+  .custom__head,
+  .custom__body {
+    grid-column: 1 / -1;
+  }
+  .custom__head h2 {
+    font-size: var(--step-3);
+  }
+  .custom__head h2::first-line {
+    font-style: normal;
+  }
+  .custom__list {
+    list-style: none;
+    margin: 32px 0 36px;
+    border-top: 1px solid var(--rule);
+    --rule: #c5b08c;
+  }
+  .custom__list li {
+    padding: 14px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .custom__list h3 {
+    font-size: 1.25rem;
+    font-weight: 450;
+    margin-bottom: 4px;
+  }
+  .custom__list p {
+    margin: 0;
+    color: var(--ink-2);
+    font-size: 0.98rem;
+  }
+
+  @media (min-width: 48rem) {
+    .custom__band :global(.custom__picture) {
+      aspect-ratio: 32 / 9;
+    }
+    .custom__list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      column-gap: var(--gutter);
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .custom__band :global(.custom__picture) {
+      aspect-ratio: 4 / 1;
+    }
+    .custom__panel {
+      padding-bottom: 112px;
+    }
+    .custom__grid {
+      padding-top: 80px;
+    }
+    .custom__head {
+      grid-column: 1 / 5;
+    }
+    .custom__head h2 {
+      font-size: calc(var(--step-3) * 1.08);
+    }
+    .custom__body {
+      grid-column: 6 / 12;
+    }
+  }
+</style>

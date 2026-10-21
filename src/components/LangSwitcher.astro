@@ -1,0 +1,69 @@
+---
+import { t, asLocale, locales, pagePath, type PageKey } from '../i18n';
+
+interface Props {
+  pageKey?: PageKey;
+  tone?: 'ink' | 'light';
+}
+const { pageKey, tone = 'ink' } = Astro.props;
+const locale = asLocale(Astro.currentLocale);
+const tr = t(locale);
+---
+
+<nav class:list={['lang', `lang--${tone}`]} aria-label={tr.nav.language}>
+  <ul>
+    {
+      locales.map((l) => (
+        <li>
+          <a
+            href={pagePath(pageKey ?? 'home', l)}
+            hreflang={l}
+            lang={l}
+            aria-current={l === locale ? 'true' : undefined}
+            aria-label={tr.langNames[l]}
+          >
+            {l.toUpperCase()}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>
+
+<style>
+  .lang ul {
+    display: flex;
+    list-style: none;
+  }
+  .lang a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    min-height: 44px;
+    padding: 0 4px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--ink-2);
+    text-decoration: none;
+  }
+  .lang a:hover {
+    color: var(--terra);
+  }
+  .lang a[aria-current] {
+    color: var(--ink);
+    text-decoration: underline;
+    text-decoration-color: var(--terra);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.35em;
+  }
+  .lang--light a {
+    color: var(--night-mute);
+  }
+  .lang--light a[aria-current],
+  .lang--light a:hover {
+    color: var(--night-ink);
+    text-decoration-color: var(--ochre);
+  }
+</style>

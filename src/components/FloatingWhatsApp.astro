@@ -1,0 +1,58 @@
+---
+import Icon from './Icon.astro';
+import { t, asLocale } from '../i18n';
+import { whatsappUrl } from '../data/site';
+const tr = t(asLocale(Astro.currentLocale));
+---
+
+<a
+  class="wa-float"
+  href={whatsappUrl(tr.wa.general)}
+  target="_blank"
+  rel="noopener"
+  aria-label={`${tr.cta.floating} ${tr.cta.newTab}`}
+>
+  <Icon name="whatsapp" />
+  <span class="wa-float__label" aria-hidden="true">{tr.cta.floating}</span>
+</a>
+
+<style>
+  /* Móvil: siempre visible, pegado abajo a la derecha. Escritorio: pequeño y discreto. */
+  .wa-float {
+    position: fixed;
+    right: 16px;
+    bottom: calc(16px + env(safe-area-inset-bottom));
+    z-index: 40;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 52px;
+    padding: 0 18px 0 14px;
+    background: var(--terra);
+    color: var(--paper);
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    box-shadow: 0 0 0 3px var(--stone);
+  }
+  .wa-float:hover {
+    background: var(--terra-dark);
+  }
+  .wa-float svg {
+    width: 24px;
+    height: 24px;
+  }
+  @media (min-width: 64rem) {
+    .wa-float {
+      min-height: 48px;
+      width: 48px;
+      padding: 0;
+      justify-content: center;
+      right: 24px;
+      bottom: 24px;
+    }
+    .wa-float__label {
+      display: none;
+    }
+  }
+</style>

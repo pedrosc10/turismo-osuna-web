@@ -1,0 +1,97 @@
+---
+/** Páginas de texto legal (aviso legal, privacidad, cookies). Todo el contenido viene de i18n. */
+import Base from '../../layouts/Base.astro';
+import Todo from '../Todo.astro';
+import { t, asLocale, type PageKey } from '../../i18n';
+
+interface Props {
+  page: Extract<PageKey, 'legal' | 'privacy' | 'cookies'>;
+}
+const { page } = Astro.props;
+const tr = t(asLocale(Astro.currentLocale));
+const doc = tr[page];
+---
+
+<Base title={doc.metaTitle} description={doc.metaDesc} pageKey={page}>
+  <article class="wrap grid prose-page">
+    <header class="prose-page__head">
+      <p class="kicker">{tr.footer.legalNav}</p>
+      <h1>{doc.title}</h1>
+      <p class="prose-page__date">{tr.lastUpdated}</p>
+    </header>
+    <div class="prose-page__body">
+      {
+        doc.sections.map((s) => (
+          <section>
+            <h2>{s.h}</h2>
+            {'todo' in s && s.todo ? (
+              <Todo block>
+                {s.p.map((para) => (
+                  <p>{para}</p>
+                ))}
+              </Todo>
+            ) : (
+              s.p.map((para) => <p>{para}</p>)
+            )}
+          </section>
+        ))
+      }
+    </div>
+  </article>
+</Base>
+
+<style>
+  .prose-page {
+    padding-top: 56px;
+    padding-bottom: 104px;
+  }
+  .prose-page__head,
+  .prose-page__body {
+    grid-column: 1 / -1;
+  }
+  .prose-page__head h1 {
+    font-size: var(--step-4);
+    font-weight: 300;
+    margin-bottom: 12px;
+    hyphens: auto;
+  }
+  .prose-page__date {
+    font-family: var(--serif);
+    font-style: italic;
+    color: var(--ink-2);
+  }
+  .prose-page__body {
+    max-width: 42rem;
+    margin-top: 32px;
+  }
+  .prose-page__body section {
+    padding: 24px 0 8px;
+    border-top: 1px solid var(--rule);
+  }
+  .prose-page__body h2 {
+    font-size: var(--step-1);
+    font-weight: 450;
+    margin-bottom: 12px;
+  }
+  .prose-page__body p {
+    overflow-wrap: anywhere;
+  }
+  @media (min-width: 64rem) {
+    .prose-page {
+      padding-top: 96px;
+    }
+    .prose-page__head {
+      grid-column: 1 / 5;
+      position: sticky;
+      top: calc(var(--header-h) + 32px);
+      align-self: start;
+    }
+    .prose-page__head h1 {
+      font-size: var(--step-3);
+    }
+    .prose-page__body {
+      grid-column: 6 / 12;
+      margin-top: 0;
+    }
+  }
+</style>

@@ -1,0 +1,40 @@
+---
+/**
+ * Foto optimizada (AVIF/WebP + JPEG de respaldo, srcset, width/height).
+ * `name` es el nombre del archivo en src/assets/photos sin extensión. El alt sale de i18n.
+ */
+import { Picture } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  name: string;
+  alt: string;
+  sizes: string;
+  widths?: number[];
+  eager?: boolean;
+  class?: string;
+  pictureClass?: string;
+}
+
+const photos = import.meta.glob<{ default: ImageMetadata }>('../assets/photos/*.jpg', { eager: true });
+const { name, alt, sizes, widths = [480, 800, 1200, 1600, 2000], eager = false, class: className, pictureClass } = Astro.props;
+const mod = photos[`../assets/photos/${name}.jpg`];
+if (!mod) throw new Error(`Foto no encontrada: ${name}`);
+const img = mod.default;
+const usable = widths.filter((w) => w <= img.width);
+---
+
+<Picture
+  src={img}
+  alt={alt}
+  widths={usable.length ? usable : [img.width]}
+  sizes={sizes}
+  formats={['avif', 'webp']}
+  fallbackFormat="jpg"
+  quality={eager ? 62 : 58}
+  loading={eager ? 'eager' : 'lazy'}
+  decoding={eager ? 'sync' : 'async'}
+  fetchpriority={eager ? 'high' : 'auto'}
+  class={className}
+  pictureAttributes={{ class: pictureClass }}
+/>

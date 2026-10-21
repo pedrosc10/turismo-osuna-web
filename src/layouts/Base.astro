@@ -1,0 +1,120 @@
+---
+import '@fontsource-variable/fraunces/opsz.css';
+import '@fontsource-variable/fraunces/opsz-italic.css';
+import '@fontsource-variable/source-sans-3/wght.css';
+import '../styles/global.css';
+import frauncesLatin from '@fontsource-variable/fraunces/files/fraunces-latin-opsz-normal.woff2?url';
+import sansLatin from '@fontsource-variable/source-sans-3/files/source-sans-3-latin-wght-normal.woff2?url';
+
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import FloatingWhatsApp from '../components/FloatingWhatsApp.astro';
+import { t, asLocale, locales, pagePath, hreflang, type PageKey } from '../i18n';
+import { site } from '../data/site';
+
+interface Props {
+  title: string;
+  description: string;
+  /** Página (para hreflang y selector de idioma). Sin pageKey = página sin traducciones enlazadas (404). */
+  pageKey?: PageKey;
+  noindex?: boolean;
+  jsonLd?: object;
+  /** true en la portada: los enlaces de navegación son anclas locales. */
+  isHome?: boolean;
+}
+
+const { title, description, pageKey, noindex = false, jsonLd, isHome = false } = Astro.props;
+const locale = asLocale(Astro.currentLocale);
+const tr = t(locale);
+const siteUrl = (Astro.site?.toString() ?? '').replace(/\/$/, '');
+const canonical = pageKey ? `${siteUrl}${pagePath(pageKey, locale)}` : undefined;
+const ogImage = `${siteUrl}/og/og-${locale}.jpg`;
+const ogLocales = { es: 'es_ES', en: 'en_GB', de: 'de_DE' } as const;
+const analyticsToken = site.analyticsToken;
+const loadAnalytics = import.meta.env.PROD && analyticsToken.length > 0;
+---
+
+<!doctype html>
+<html lang={locale} dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex" />}
+    {canonical && <link rel="canonical" href={canonical} />}
+    {
+      pageKey &&
+        locales.map((l) => <link rel="alternate" hreflang={hreflang[l]} href={`${siteUrl}${pagePath(pageKey, l)}`} />)
+    }
+    {pageKey && <link rel="alternate" hreflang="x-default" href={`${siteUrl}${pagePath(pageKey, 'es')}`} />}
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#f2eadb" />
+
+    <link rel="preload" href={frauncesLatin} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={sansLatin} as="font" type="font/woff2" crossorigin />
+
+    <!-- Open Graph / Twitter -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.brand} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    {canonical && <meta property="og:url" content={canonical} />}
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={tr.meta.ogAlt} />
+    <meta property="og:locale" content={ogLocales[locale]} />
+    {
+      locales
+        .filter((l) => l !== locale)
+        .map((l) => <meta property="og:locale:alternate" content={ogLocales[l]} />)
+    }
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={tr.meta.ogAlt} />
+
+    {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+
+    <script is:inline>
+      document.documentElement.classList.add('js');
+    </script>
+
+    {
+      import.meta.env.DEV && (
+        <style is:inline>
+          {`.todo-v2{outline:2px dashed #c2185b;outline-offset:2px;background:rgba(255,214,0,.28);text-decoration:underline dashed #c2185b}`}
+        </style>
+      )
+    }
+
+    {
+      loadAnalytics && (
+        <script
+          is:inline
+          defer
+          src="https://static.cloudflareinsights.com/beacon.min.js"
+          data-cf-beacon={JSON.stringify({ token: analyticsToken })}
+        />
+      )
+    }
+  </head>
+  <body>
+    <a class="skip-link" href="#main">{tr.nav.skip}</a>
+    <Header pageKey={pageKey} isHome={isHome} />
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <Footer pageKey={pageKey} />
+    <FloatingWhatsApp />
+    <script>
+      import '../scripts/reveal';
+    </script>
+  </body>
+</html>

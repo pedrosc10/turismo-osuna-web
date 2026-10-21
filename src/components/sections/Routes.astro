@@ -1,0 +1,464 @@
+---
+import Photo from '../Photo.astro';
+import Icon from '../Icon.astro';
+import RouteFacts from './RouteFacts.astro';
+import Feature from './RouteFeature.astro';
+import { t, asLocale } from '../../i18n';
+import { routes, whatsappUrl, type Route } from '../../data/site';
+
+const locale = asLocale(Astro.currentLocale);
+const tr = t(locale);
+const rs = tr.routesSection;
+const text = (r: Route) => tr.routes[r.id as keyof typeof tr.routes];
+const book = (r: Route) => whatsappUrl(tr.wa.route(text(r).name));
+
+const [colegiata, universidad, encarnacion, sanpedro, canteras, cine, nocturna] = routes;
+const pair = [universidad, encarnacion];
+const index = [canteras, cine];
+---
+
+<section id="rutas" class="routes" aria-labelledby="rutas-title">
+  <header class="wrap grid routes__head">
+    <div class="routes__head-title">
+      <p class="kicker"><span class="num">02</span> {rs.kicker}</p>
+      <h2 id="rutas-title">{rs.title}</h2>
+    </div>
+    <div class="routes__head-intro">
+      <p class="lead">{rs.intro}</p>
+      <p class="routes__groups">{rs.groups}</p>
+    </div>
+  </header>
+
+  <!-- I: composición destacada, con foto vertical en arco -->
+  <Feature r={colegiata} mirror={false} />
+
+  <!-- II y III: pareja desfasada -->
+  <div class="wrap grid r-pair">
+    {
+      pair.map((r, i) => (
+        <article class:list={['r-pair__item', `r-pair__item--${i + 1}`]} id={`ruta-${r.id}`} aria-labelledby={`t-${r.id}`}>
+          <figure class="r-pair__media reveal">
+            <Photo
+              name={r.image}
+              alt={tr.alt[r.image]}
+              sizes="(min-width: 64rem) 42vw, 100vw"
+              widths={[480, 720, 960, 1280]}
+              pictureClass="r-pair__picture"
+              class="r-pair__img"
+            />
+            <figcaption class="fig">{text(r).caption}</figcaption>
+          </figure>
+          <div class="r-pair__body">
+            <span class="numeral numeral--side" aria-hidden="true">
+              {r.numeral}
+            </span>
+            <h3 id={`t-${r.id}`} class="r-title">
+              {text(r).name}
+            </h3>
+            <p class="r-desc">{text(r).desc}</p>
+            <RouteFacts route={r} />
+            <a class="btn r-book" href={book(r)} target="_blank" rel="noopener">
+              <Icon name="whatsapp" />
+              {tr.cta.bookRoute}
+              <span class="visually-hidden">
+                : {text(r).shortName} {tr.cta.newTab}
+              </span>
+            </a>
+          </div>
+        </article>
+      ))
+    }
+  </div>
+
+  <!-- IV: destacada en espejo -->
+  <Feature r={sanpedro} mirror={true} />
+
+  <!-- V y VI: filas de índice -->
+  <div class="wrap r-index">
+    {
+      index.map((r) => (
+        <article class="r-index__row" id={`ruta-${r.id}`} aria-labelledby={`t-${r.id}`}>
+          <span class="numeral numeral--index" aria-hidden="true">
+            {r.numeral}
+          </span>
+          <figure class="r-index__media">
+            <Photo
+              name={r.image}
+              alt={tr.alt[r.image]}
+              sizes="(min-width: 64rem) 22vw, 100vw"
+              widths={[480, 720, 960]}
+              pictureClass="r-index__picture"
+              class="r-index__img"
+            />
+          </figure>
+          <div class="r-index__body">
+            <h3 id={`t-${r.id}`} class="r-title r-title--sm">
+              {text(r).name}
+            </h3>
+            <p class="r-desc">{text(r).desc}</p>
+            <p class="fig r-index__fig">{text(r).caption}</p>
+          </div>
+          <div class="r-index__facts">
+            <RouteFacts route={r} compact />
+            <a class="btn r-book" href={book(r)} target="_blank" rel="noopener">
+              <Icon name="whatsapp" />
+              {tr.cta.bookRoute}
+              <span class="visually-hidden">
+                : {text(r).shortName} {tr.cta.newTab}
+              </span>
+            </a>
+          </div>
+        </article>
+      ))
+    }
+  </div>
+
+  <!-- VII: la noche como ruptura -->
+  <article class="r-night on-night" id={`ruta-${nocturna.id}`} aria-labelledby={`t-${nocturna.id}`}>
+    <div class="r-night__media">
+      <Photo
+        name={nocturna.image}
+        alt={tr.alt[nocturna.image]}
+        sizes="(min-width: 64rem) 58vw, 100vw"
+        widths={[480, 720, 960, 1280, 1600]}
+        pictureClass="r-night__picture"
+        class="r-night__img"
+      />
+    </div>
+    <div class="wrap grid r-night__grid">
+      <div class="r-night__body">
+        <span class="numeral numeral--night" aria-hidden="true">{nocturna.numeral}</span>
+        <h3 id={`t-${nocturna.id}`} class="r-title r-title--night">{text(nocturna).name}</h3>
+        <p class="r-desc">{text(nocturna).desc}</p>
+        <RouteFacts route={nocturna} />
+        <a class="btn btn--ochre r-book" href={book(nocturna)} target="_blank" rel="noopener">
+          <Icon name="whatsapp" />
+          {tr.cta.bookRoute}
+          <span class="visually-hidden">
+            : {text(nocturna).shortName} {tr.cta.newTab}
+          </span>
+        </a>
+        <p class="fig r-night__fig">{text(nocturna).caption}</p>
+      </div>
+    </div>
+  </article>
+</section>
+
+<style>
+  .routes {
+    padding: 72px 0 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .routes__head {
+    row-gap: 8px;
+    margin-bottom: 56px;
+  }
+  .routes__head-title,
+  .routes__head-intro {
+    grid-column: 1 / -1;
+  }
+  .routes__head h2 {
+    font-size: var(--step-3);
+    max-width: 14ch;
+  }
+  .routes__groups {
+    font-size: 0.95rem;
+    color: var(--ink-2);
+    font-style: italic;
+    font-family: var(--serif);
+    margin: 0;
+  }
+
+  /* --- Pareja --- */
+  .r-pair {
+    row-gap: 64px;
+    padding: 24px var(--margin) 80px;
+  }
+  .r-pair__item {
+    grid-column: 1 / -1;
+  }
+  .r-pair__media :global(.r-pair__picture) {
+    display: block;
+    aspect-ratio: 4 / 3;
+    background: var(--stone-2);
+  }
+  .r-pair__item--2 .r-pair__media :global(.r-pair__picture) {
+    aspect-ratio: 1 / 1;
+  }
+  .r-pair__media :global(.r-pair__img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .r-pair__body {
+    margin-top: 22px;
+  }
+  .numeral--side {
+    font-size: clamp(2.4rem, 2rem + 2vw, 3.8rem);
+  }
+
+  /* --- Índice --- */
+  .r-index {
+    padding-bottom: 88px;
+  }
+  .r-index__row {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: 16px;
+    padding: 28px 0 36px;
+    border-top: 2px solid var(--ink);
+  }
+  .r-index__row + .r-index__row {
+    border-top-width: 1px;
+  }
+  .numeral--index {
+    font-size: clamp(2.2rem, 1.8rem + 1.5vw, 3.2rem);
+    grid-row: 1;
+    margin: 0;
+  }
+  .r-index__media {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    margin: 16px 0 20px;
+  }
+  .r-index__media :global(.r-index__picture) {
+    display: block;
+    aspect-ratio: 16 / 9;
+  }
+  .r-index__media :global(.r-index__img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .r-index__body {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: center;
+  }
+  .r-index__body .r-desc,
+  .r-index__body .r-index__fig {
+    display: none;
+  }
+  .r-index__facts {
+    grid-column: 1 / -1;
+  }
+  .r-index__facts::before {
+    content: '';
+  }
+  .r-index__mobile-desc {
+    grid-column: 1 / -1;
+  }
+
+  /* --- Noche --- */
+  .r-night {
+    background: var(--night);
+    color: var(--night-ink);
+    --rule: rgba(237, 227, 208, 0.22);
+  }
+  .r-night__media :global(.r-night__picture) {
+    display: block;
+    aspect-ratio: 16 / 10;
+  }
+  .r-night__media :global(.r-night__img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 78%;
+  }
+  .r-night__grid {
+    padding-top: 40px;
+    padding-bottom: 72px;
+  }
+  .r-night__body {
+    grid-column: 1 / -1;
+  }
+  .numeral--night {
+    color: var(--ochre);
+  }
+  .r-title--night {
+    font-style: italic;
+    font-size: var(--step-3);
+  }
+  .r-night :global(.cartela dt) {
+    color: var(--night-mute);
+  }
+  .r-night :global(.cartela dd) {
+    color: var(--night-ink);
+  }
+  .r-night__fig {
+    color: var(--night-mute);
+    margin-top: 28px;
+  }
+
+  @media (max-width: 47.99rem) {
+    .r-index__row {
+      grid-template-areas:
+        'num title'
+        'media media'
+        'desc desc'
+        'facts facts';
+    }
+    .r-index__body {
+      display: contents;
+    }
+    .r-index__body .r-title {
+      grid-area: title;
+      align-self: center;
+      margin: 0;
+    }
+    .numeral--index {
+      grid-area: num;
+    }
+    .r-index__media {
+      grid-area: media;
+    }
+    .r-index__body .r-desc {
+      display: block;
+      grid-area: desc;
+    }
+    .r-index__facts {
+      grid-area: facts;
+    }
+  }
+
+  @media (min-width: 48rem) {
+    .routes__head-title {
+      grid-column: 1 / 6;
+    }
+    .routes__head-intro {
+      grid-column: 5 / 9;
+      padding-top: 2.2rem;
+    }
+    .r-pair__item--1 {
+      grid-column: 1 / 5;
+    }
+    .r-pair__item--2 {
+      grid-column: 5 / 9;
+      margin-top: 120px;
+    }
+    .r-index__row {
+      grid-template-columns: 4.5rem minmax(0, 2fr) minmax(0, 3fr);
+      column-gap: var(--gutter);
+      align-items: start;
+    }
+    .numeral--index {
+      grid-row: 1 / 3;
+    }
+    .r-index__media {
+      grid-column: 2;
+      grid-row: 1 / 3;
+      margin: 0;
+    }
+    .r-index__media :global(.r-index__picture) {
+      aspect-ratio: 1 / 1;
+    }
+    .r-index__body {
+      grid-column: 3;
+      grid-row: 1;
+    }
+    .r-index__body .r-desc,
+    .r-index__body .r-index__fig {
+      display: block;
+    }
+    .r-index__facts {
+      grid-column: 3;
+      grid-row: 2;
+    }
+    .r-night__media :global(.r-night__picture) {
+      aspect-ratio: 21 / 9;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .routes {
+      padding-top: 120px;
+    }
+    .routes__head {
+      margin-bottom: 72px;
+    }
+    .routes__head-title {
+      grid-column: 1 / 7;
+    }
+    .routes__head-intro {
+      grid-column: 8 / 12;
+      padding-top: 3rem;
+    }
+
+    .r-pair {
+      padding-bottom: 120px;
+    }
+    .r-pair__item--1 {
+      grid-column: 1 / 7;
+    }
+    .r-pair__item--2 {
+      grid-column: 8 / 13;
+      margin-top: 200px;
+    }
+    .r-pair__body {
+      display: grid;
+      grid-template-columns: 4.5rem 1fr;
+      column-gap: 16px;
+    }
+    .r-pair__body > :not(.numeral) {
+      grid-column: 2;
+    }
+    .r-pair__body .numeral {
+      grid-row: 1 / 3;
+    }
+    .r-pair__body .r-book {
+      justify-self: start;
+    }
+
+    .r-index {
+      padding-bottom: 120px;
+    }
+    .r-index__row {
+      grid-template-columns: 7rem minmax(0, 3fr) minmax(0, 4fr) minmax(0, 3fr);
+      padding: 36px 0 44px;
+    }
+    .numeral--index {
+      grid-row: 1;
+      font-size: 3.6rem;
+    }
+    .r-index__media {
+      grid-column: 2;
+      grid-row: 1;
+    }
+    .r-index__body {
+      grid-column: 3;
+      grid-row: 1;
+      align-self: start;
+    }
+    .r-index__facts {
+      grid-column: 4;
+      grid-row: 1;
+    }
+    .r-index__facts .r-book {
+      margin-top: 18px;
+    }
+
+    .r-night {
+      display: grid;
+      grid-template-columns: 1fr;
+      position: relative;
+    }
+    .r-night__media {
+      position: absolute;
+      inset: 0 0 0 42%;
+    }
+    .r-night__media :global(.r-night__picture) {
+      height: 100%;
+      aspect-ratio: auto;
+    }
+    .r-night__grid {
+      position: relative;
+      padding-top: 104px;
+      padding-bottom: 104px;
+      min-height: 640px;
+    }
+    .r-night__body {
+      grid-column: 1 / 6;
+    }
+  }
+</style>

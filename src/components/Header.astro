@@ -1,0 +1,258 @@
+---
+import Logo from './Logo.astro';
+import Icon from './Icon.astro';
+import LangSwitcher from './LangSwitcher.astro';
+import { t, asLocale, pagePath, type PageKey } from '../i18n';
+import { whatsappUrl } from '../data/site';
+
+interface Props {
+  pageKey?: PageKey;
+  isHome?: boolean;
+}
+const { pageKey, isHome = false } = Astro.props;
+const locale = asLocale(Astro.currentLocale);
+const tr = t(locale);
+const home = pagePath('home', locale);
+const anchor = (id: string) => (isHome ? `#${id}` : `${home}#${id}`);
+
+const items = [
+  { id: 'rutas', label: tr.nav.routes },
+  { id: 'a-medida', label: tr.nav.custom },
+  { id: 'galeria', label: tr.nav.gallery },
+  { id: 'faq', label: tr.nav.faq },
+  { id: 'encuentro', label: tr.nav.map },
+  { id: 'contacto', label: tr.nav.contact },
+];
+---
+
+<header class="site-header">
+  <div class="wrap site-header__inner">
+    <a class="site-header__home" href={home} aria-label={`${tr.nav.home}`}>
+      <Logo />
+    </a>
+
+    <nav class="site-nav" id="site-nav" aria-label={tr.nav.mainNav} data-nav>
+      <ol class="site-nav__list">
+        {
+          items.map((item, i) => (
+            <li>
+              <a href={anchor(item.id)} data-nav-link>
+                <span class="site-nav__num" aria-hidden="true">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+      <div class="site-nav__mobile-extra">
+        <a class="btn" href={whatsappUrl(tr.wa.general)} target="_blank" rel="noopener">
+          <Icon name="whatsapp" />
+          {tr.cta.whatsapp}
+          <span class="visually-hidden">{tr.cta.newTab}</span>
+        </a>
+      </div>
+    </nav>
+
+    <div class="site-header__tools">
+      <LangSwitcher pageKey={pageKey} />
+      <a class="btn site-header__cta" href={whatsappUrl(tr.wa.general)} target="_blank" rel="noopener">
+        <Icon name="whatsapp" />
+        <span class="site-header__cta-text">{tr.cta.whatsapp}</span>
+        <span class="visually-hidden">{tr.cta.newTab}</span>
+      </a>
+      <button
+        class="site-header__menu"
+        type="button"
+        aria-expanded="false"
+        aria-controls="site-nav"
+        data-menu-button
+        data-label-open={tr.nav.menu}
+        data-label-close={tr.nav.closeMenu}
+      >
+        <Icon name="menu" />
+        <span class="site-header__menu-label">{tr.nav.menu}</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--stone);
+    border-bottom: 1px solid var(--rule);
+  }
+  .site-header__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    min-height: var(--header-h);
+  }
+  .site-header__home {
+    text-decoration: none;
+    display: inline-flex;
+    padding: 6px 0;
+    min-width: 0;
+  }
+  .site-header__tools {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .site-header__cta {
+    display: none;
+    min-height: 44px;
+    padding: 10px 16px;
+    font-size: 0.95rem;
+  }
+  .site-header__menu {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 44px;
+    min-width: 44px;
+    padding: 8px 10px;
+    background: transparent;
+    border: 1.5px solid var(--ink);
+    color: var(--ink);
+    font: 600 0.9rem/1 var(--sans);
+    cursor: pointer;
+  }
+  .site-header__menu svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  /* Navegación — móvil: panel desplegable a pantalla completa */
+  .site-nav {
+    position: fixed;
+    inset: var(--header-h) 0 0 0;
+    background: var(--stone);
+    padding: 24px var(--margin) 40px;
+    overflow-y: auto;
+    display: none;
+    flex-direction: column;
+    gap: 32px;
+  }
+  .site-nav.is-open {
+    display: flex;
+  }
+  .site-nav__list {
+    list-style: none;
+    border-top: 1px solid var(--rule);
+  }
+  .site-nav__list a {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--rule);
+    font-family: var(--serif);
+    font-size: 1.9rem;
+    font-weight: 360;
+    text-decoration: none;
+    color: var(--ink);
+  }
+  .site-nav__num {
+    font-family: var(--sans);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: var(--terra);
+    min-width: 1.6rem;
+  }
+
+  /* Sin JS, el menú móvil no puede abrirse: mostramos la lista en línea */
+  :global(html:not(.js)) .site-nav {
+    position: static;
+    display: block;
+    padding: 0;
+  }
+  :global(html:not(.js)) .site-header__menu {
+    display: none;
+  }
+
+  @media (min-width: 64rem) {
+    .site-header__menu,
+    .site-nav__mobile-extra {
+      display: none;
+    }
+    .site-header__cta {
+      display: inline-flex;
+    }
+    .site-nav {
+      position: static;
+      display: block;
+      padding: 0;
+      background: none;
+      overflow: visible;
+      margin-left: auto;
+    }
+    .site-nav__list {
+      display: flex;
+      gap: 4px;
+      border: 0;
+    }
+    .site-nav__list a {
+      font-family: var(--sans);
+      font-size: 0.95rem;
+      font-weight: 500;
+      padding: 10px 10px;
+      border: 0;
+      gap: 6px;
+      min-height: 44px;
+      align-items: center;
+    }
+    .site-nav__list a:hover {
+      color: var(--terra);
+    }
+    .site-nav__num {
+      display: none;
+    }
+  }
+  @media (min-width: 64rem) and (max-width: 80rem) {
+    .site-nav__list a {
+      padding-inline: 7px;
+      font-size: 0.9rem;
+    }
+    .site-header__cta-text {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+    }
+    .site-header__cta {
+      padding: 10px 12px;
+    }
+  }
+</style>
+
+<script>
+  const button = document.querySelector<HTMLButtonElement>('[data-menu-button]');
+  const nav = document.querySelector<HTMLElement>('[data-nav]');
+  if (button && nav) {
+    const label = button.querySelector('.site-header__menu-label');
+    const setOpen = (open: boolean) => {
+      nav.classList.toggle('is-open', open);
+      button.setAttribute('aria-expanded', String(open));
+      if (label) label.textContent = open ? button.dataset.labelClose! : button.dataset.labelOpen!;
+      document.body.style.overflow = open ? 'hidden' : '';
+    };
+    button.addEventListener('click', () => setOpen(button.getAttribute('aria-expanded') !== 'true'));
+    nav.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => setOpen(false)));
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && nav.classList.contains('is-open')) {
+        setOpen(false);
+        button.focus();
+      }
+    });
+    window.matchMedia('(min-width: 64rem)').addEventListener('change', (e) => e.matches && setOpen(false));
+  }
+</script>

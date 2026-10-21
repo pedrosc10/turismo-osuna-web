@@ -1,0 +1,22 @@
+---
+/**
+ * Marca visualmente un dato provisional (TODO-V2) SOLO en `astro dev`.
+ * En el build de producción se renderiza únicamente el contenido, sin envoltorio ni estilos.
+ */
+interface Props {
+  block?: boolean;
+}
+const { block = false } = Astro.props;
+const dev = import.meta.env.DEV;
+const Tag = block ? 'div' : 'span';
+---
+
+{
+  dev ? (
+    <Tag class="todo-v2" title="TODO-V2: dato provisional">
+      <slot />
+    </Tag>
+  ) : (
+    <slot />
+  )
+}

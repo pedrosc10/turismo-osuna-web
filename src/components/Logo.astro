@@ -1,0 +1,65 @@
+---
+/**
+ * Logotipo tipográfico provisional: arco de medio punto con dovela + nombre comercial.
+ * Para sustituirlo por un logo definitivo, cambia este componente (o pon un <img src="/logo.svg">).
+ */
+import { site } from '../data/site';
+import Todo from './Todo.astro';
+interface Props {
+  tone?: 'ink' | 'light';
+}
+const { tone = 'ink' } = Astro.props;
+---
+
+<span class:list={['logo', `logo--${tone}`]}>
+  <svg class="logo__mark" viewBox="0 0 40 48" width="30" height="36" aria-hidden="true" focusable="false">
+    <path d="M4 47V22a16 16 0 0 1 32 0v25" fill="none" stroke="currentColor" stroke-width="3.2"></path>
+    <path d="M11 47V23a9 9 0 0 1 18 0v24" fill="none" stroke="currentColor" stroke-width="1.4"></path>
+    <path d="M17.5 3.6h5l-.9 5.6h-3.2z" fill="var(--logo-accent)"></path>
+  </svg>
+  <span class="logo__text">
+    <Todo><span class="logo__name">{site.brand}</span></Todo>
+    <span class="logo__tag">{site.brandTagline} · Osuna</span>
+  </span>
+</span>
+
+<style>
+  .logo {
+    --logo-accent: var(--terra);
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--ink);
+    line-height: 1;
+  }
+  .logo--light {
+    --logo-accent: var(--ochre);
+    color: var(--night-ink);
+  }
+  .logo__mark {
+    flex: none;
+    width: 26px;
+    height: auto;
+  }
+  .logo__text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .logo__name {
+    font-family: var(--serif);
+    font-size: 1.22rem;
+    font-weight: 450;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+  }
+  .logo__tag {
+    font-family: var(--sans);
+    font-size: 0.66rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    opacity: 0.8;
+    white-space: nowrap;
+  }
+</style>

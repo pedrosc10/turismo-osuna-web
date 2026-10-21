@@ -1,0 +1,53 @@
+---
+import Base from '../../layouts/Base.astro';
+import Icon from '../Icon.astro';
+import { t, asLocale, pagePath } from '../../i18n';
+
+const locale = asLocale(Astro.currentLocale);
+const tr = t(locale);
+const n = tr.notFound;
+---
+
+<Base title={n.metaTitle} description={n.text} noindex>
+  <section class="wrap nf">
+    <p class="kicker">{n.kicker}</p>
+    <h1>{n.title}</h1>
+    <p class="lead">{n.text}</p>
+    <a class="btn" href={pagePath('home', locale)}>
+      {n.back}
+      <Icon name="arrow" />
+    </a>
+    <svg class="nf__arch" viewBox="0 0 200 240" aria-hidden="true" focusable="false">
+      <path d="M10 240V100a90 90 0 0 1 180 0v140" fill="none" stroke="currentColor" stroke-width="2"></path>
+      <path d="M40 240V104a60 60 0 0 1 120 0v136" fill="none" stroke="currentColor" stroke-width="1"></path>
+    </svg>
+  </section>
+</Base>
+
+<style>
+  .nf {
+    position: relative;
+    isolation: isolate;
+    padding-top: 72px;
+    padding-bottom: 120px;
+    min-height: 60vh;
+  }
+  .nf h1 {
+    font-size: var(--step-4);
+    font-weight: 300;
+    max-width: 14ch;
+    margin-bottom: 20px;
+  }
+  .nf .lead {
+    max-width: 32rem;
+    margin-bottom: 32px;
+  }
+  .nf__arch {
+    position: absolute;
+    right: var(--margin);
+    bottom: 40px;
+    width: clamp(120px, 22vw, 280px);
+    color: var(--rule);
+    z-index: -1;
+  }
+</style>

@@ -1,0 +1,20 @@
+{
+  "name": "Osuna Paso a Paso · Visitas guiadas",
+  "short_name": "Osuna Paso a Paso",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#f2eadb",
+  "background_color": "#f2eadb",
+  "display": "browser",
+  "start_url": "/"
+}

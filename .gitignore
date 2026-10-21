@@ -22,3 +22,6 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# informes temporales de lighthouse (los definitivos sí se versionan en /reports)
+.lighthouseci/

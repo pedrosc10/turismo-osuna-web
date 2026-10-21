@@ -1,0 +1,33 @@
+---
+/**
+ * Cenefa geométrica inspirada en el alicatado sevillano (estrella de ocho puntas en retícula).
+ * Se usa exactamente dos veces (DESIGN.md §6.4). Puramente decorativa.
+ */
+interface Props {
+  id: string;
+  class?: string;
+}
+const { id, class: className } = Astro.props;
+---
+
+<svg class:list={['azulejo', className]} width="100%" height="36" aria-hidden="true" focusable="false">
+  <defs>
+    <pattern id={id} width="36" height="36" patternUnits="userSpaceOnUse">
+      <rect width="36" height="36" fill="var(--az-bg, #f2eadb)"></rect>
+      <path
+        d="M18 3 21.5 10.5 29 7 25.5 14.5 33 18 25.5 21.5 29 29 21.5 25.5 18 33 14.5 25.5 7 29 10.5 21.5 3 18 10.5 14.5 7 7 14.5 10.5Z"
+        fill="var(--az-star, #a3401f)"></path>
+      <circle cx="18" cy="18" r="3.4" fill="var(--az-bg, #f2eadb)"></circle>
+      <path d="M0 0h6L0 6zM36 0h-6l6 6zM0 36h6l-6-6zM36 36h-6l6-6z" fill="var(--az-corner, #4e5631)"></path>
+    </pattern>
+  </defs>
+  <rect width="100%" height="36" fill={`url(#${id})`}></rect>
+</svg>
+
+<style>
+  .azulejo {
+    display: block;
+    width: 100%;
+    height: 36px;
+  }
+</style>
