@@ -88,11 +88,13 @@ const loadAnalytics = import.meta.env.PROD && analyticsToken.length > 0;
       document.documentElement.classList.add('js');
     </script>
 
+    {/* Marcado visual de datos provisionales: solo en `astro dev`, nunca en producción */}
     {
       import.meta.env.DEV && (
-        <style is:inline>
-          {`.todo-v2{outline:2px dashed #c2185b;outline-offset:2px;background:rgba(255,214,0,.28);text-decoration:underline dashed #c2185b}`}
-        </style>
+        <style
+          is:inline
+          set:html=".todo-v2{outline:2px dashed #c2185b;outline-offset:2px;background:rgba(255,214,0,.28);text-decoration:underline dashed #c2185b}"
+        />
       )
     }
 

@@ -94,4 +94,23 @@ Foco visible propio (contorno de 3 px ocre/terracota con separación), objetivos
 
 ## 10. Registro de cambios tras la revisión con capturas
 
-_(Se completa después de la verificación con Playwright; ver más abajo.)_
+Revisé las capturas de `reports/screenshots/` (375, 768, 1280 y 1920 px, en los tres idiomas) con ojo de diseñador y con la lista anti-plantilla de §1 delante. Cambios hechos:
+
+| # | Qué vi | Por qué era un problema | Qué cambié |
+|---|---|---|---|
+| 1 | En las rutas II–III (pareja), la cartela caía en la estrecha columna del numeral y el botón se estiraba a su lado como un bloque terracota enorme. | Rompía la retícula y el botón parecía un banner. Causa: el estilo con ámbito de Astro no alcanzaba al componente hijo `RouteFacts`. | Selector `:global()` para colocar todo lo que no es numeral en la columna de texto. |
+| 2 | El orden de las rutas se lograba con `order` de CSS. | El orden de tabulación no coincidía con el visual (WCAG 2.4.3). | Reestructuré el marcado: I (destacada) → II–III (pareja) → IV (destacada en espejo) → V–VI (índice) → VII (noche), en ese orden en el DOM. La destacada pasó a su propio componente `RouteFeature`. |
+| 3 | La primera cenefa era una estrella de puntas finas en terracota. | Parecía una tira de estrellas navideñas, no azulejería. Demasiado «decoración de plantilla». | Redibujada como alicatado: estrella de ocho puntas formada por dos cuadrados girados, con hueco central y cuartos de rombo en las esquinas que forman rombos al repetirse. |
+| 4 | En la galería, la aldaba ocupaba la celda grande (3×2) y se veía borrosa y sin contexto. | Un detalle ampliado a tamaño protagonista parece un error, no una decisión. | Reordené la galería: la aldaba va a la celda vertical estrecha (su proporción natural) y el patio de la Universidad a la grande; la panorámica de la plaza de toros a la celda ancha. |
+| 5 | En 375 px el nombre del logo se montaba sobre el selector de idioma. | Texto solapado; además el selector debía seguir visible en la cabecera. | En pantallas < 480 px el selector muestra solo los otros dos idiomas, el botón de menú queda como icono (con nombre accesible) y el logo se reduce ligeramente. |
+| 6 | En móvil, el bloque de texto del hero (que se monta sobre la foto) tapaba el pie de foto «fig. 1». | Quedaban restos de texto asomando bajo el titular. | El pie de la foto del hero solo se muestra en escritorio, donde hay sitio. |
+| 7 | La ruta nocturna enseñaba sobre todo cielo vacío. | Media pantalla de gris azulado sin información. | Encuadre anclado abajo (`object-position: 50% 100%`) para que dominen los tejados y las torres. |
+| 8 | La foto nocturna y la panorámica de «Visitas a medida» iban pegadas. | Dos imágenes a sangre seguidas se leían como una sola franja confusa. | Aire entre ambas (56/96 px), para que la noche cierre el índice de rutas y la panorámica abra una sección nueva. |
+| 9 | La cenefa del pie no tenía margen y el logo quedaba pegado a ella. | Mismo problema de ámbito CSS que el n.º 1. | Selector `:global()` en el pie. |
+| 10 | «10:00 y 17:30 h» partía la «h» sola en otra línea. | Viuda tipográfica en la cartela. | Espacio irrompible antes de «h» / «Uhr». |
+| 11 | En la cartela de contacto, la etiqueta larga «Guía oficial de turismo de Andalucía» ensanchaba la columna. | Valores empujados a la derecha y horario partido. | Columna de etiqueta fija (11 rem) que permite partir la etiqueta. |
+| 12 | Los idiomas de cada ruta salían siempre en el orden «español, inglés, alemán…». | En la página alemana lo natural es empezar por el alemán. | El idioma de la página va primero en la cartela. |
+
+Además, por rendimiento (Lighthouse móvil 91 → 98): CSS en línea en el HTML, la hoja de Leaflet se carga solo al llegar al mapa, Fraunces pasa del archivo con eje óptico (67 + 82 KB) al de peso (37 + 46 KB) y se ajustó la calidad AVIF. Visualmente no hay diferencia apreciable.
+
+**Crítica anti-plantilla, resultado final:** el hero no está centrado ni oscurecido, y la foto en arco es la firma; las siete rutas usan cuatro composiciones distintas; no hay iconos decorativos (solo WhatsApp, teléfono y los controles de la galería); no hay sombras difusas, degradados ni esquinas redondeadas salvo el arco; y cada sección tiene su propio ritmo y su propio fondo (piedra, piedra oscura, papel, noche). La sección más «estándar» sigue siendo la FAQ, que he dejado sobria a propósito: título fijo en la columna de margen y filetes numerados, sin cajas.
