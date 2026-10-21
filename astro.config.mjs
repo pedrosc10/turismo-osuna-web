@@ -5,10 +5,11 @@ import sitemap from '@astrojs/sitemap';
 import { copyLocale404 } from './src/integrations/copy-locale-404.mjs';
 import { sitemapLinks } from './src/i18n/pages.mjs';
 
-// La URL base es configurable: SITE_URL en .env o en las variables de entorno de Cloudflare Pages.
-// Mientras no haya dominio se usa la URL provisional de Cloudflare Pages.
+// La URL base es configurable: SITE_URL en .env o en las variables de build de Cloudflare.
+// Mientras no haya dominio se usa la URL de demostración en workers.dev (para enseñársela al cliente).
+// Con una URL *.workers.dev o *.pages.dev todas las páginas llevan noindex (ver isPreviewSite en src/data/site.ts).
 const env = loadEnv(process.env.NODE_ENV ?? 'production', process.cwd(), '');
-const SITE_URL = env.SITE_URL || 'https://osuna-visitas.pages.dev'; // TODO-V2: dato provisional (dominio)
+const SITE_URL = env.SITE_URL || 'https://turismo-osuna-web.pedritosc2000.workers.dev'; // TODO-V2: dato provisional (dominio)
 
 // https://astro.build/config
 export default defineConfig({

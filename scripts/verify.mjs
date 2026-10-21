@@ -29,6 +29,9 @@ const site = (() => {
   return new URL(robots.match(/Sitemap: (\S+)/)[1]).origin;
 })();
 
+// Misma regla que isPreviewSite (src/data/site.ts): en workers.dev / pages.dev todo va con noindex
+const preview = /\.(workers|pages)\.dev$/.test(new URL(site).hostname);
+
 const attr = (tag, name) => tag.match(new RegExp(`\\s${name}="([^"]*)"`))?.[1];
 const decode = (s) => s.replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;/g, "'");
 
@@ -45,6 +48,7 @@ let ldCount = 0;
 
 for (const [url, { html }] of pages) {
   const is404 = /404/.test(url);
+  const hasNoindex = /<meta name="robots" content="noindex"/.test(html);
   const lang = html.match(/<html[^>]*\slang="([^"]+)"/)?.[1];
   const expectedLang = url.startsWith('/en/') ? 'en' : url.startsWith('/de/') ? 'de' : 'es';
   if (lang !== expectedLang) err(url, `lang="${lang}" (esperado ${expectedLang})`);
@@ -139,7 +143,8 @@ for (const [url, { html }] of pages) {
     const og = html.match(/<meta property="og:image" content="([^"]+)"/)?.[1];
     if (!og || !existsSync(path.join(dist, og.replace(site, '')))) err(url, `og:image inexistente: ${og}`);
     if (!/<meta name="description" content="[^"]{50,}"/.test(html)) err(url, 'meta description corta o ausente');
-  } else if (!/name="robots" content="noindex"/.test(html)) err(url, '404 sin noindex');
+  } else if (!hasNoindex) err(url, '404 sin noindex');
+  if (!is404 && hasNoindex !== preview) err(url, preview ? 'falta noindex (URL de demostración)' : 'noindex en página indexable');
 }
 
 // Títulos y descripciones únicos
@@ -159,7 +164,7 @@ for (const u of locs) if (!pages.has(u)) err('sitemap', `URL sin página: ${u}`)
 if ((sm.match(/hreflang="x-default"/g) ?? []).length !== locs.length) err('sitemap', 'faltan x-default');
 
 // Mapa: OSM y sin Google
-notes.push(`${pages.size} páginas HTML, ${waCount} enlaces wa.me, ${telCount} enlaces tel:, ${ldCount} bloques JSON-LD, ${locs.length} URLs en el sitemap.`);
+notes.push(`${pages.size} páginas HTML, ${waCount} enlaces wa.me, ${telCount} enlaces tel:, ${ldCount} bloques JSON-LD, ${locs.length} URLs en el sitemap. ${preview ? "URL de demostración: todas las páginas con noindex." : "URL definitiva: páginas indexables."}`);
 console.log(notes.join('\n'));
 if (errors.length) {
   console.error(errors.join('\n'));

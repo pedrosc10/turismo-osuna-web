@@ -131,6 +131,16 @@ export const gallery = [
 ];
 
 /** Enlace de WhatsApp con mensaje prerrellenado. */
+/**
+ * true si la web se publica en una URL de demostración de Cloudflare (*.workers.dev, *.pages.dev):
+ * entonces todas las páginas llevan noindex para que los buscadores no indexen datos provisionales.
+ * Al definir SITE_URL con el dominio definitivo, la web pasa a ser indexable sin tocar nada más.
+ */
+export function isPreviewSite(siteUrl: URL | string | undefined): boolean {
+  if (!siteUrl) return true;
+  return /\.(workers|pages)\.dev$/.test(new URL(siteUrl).hostname);
+}
+
 export function whatsappUrl(message: string): string {
   return `https://wa.me/${site.whatsapp}?text=${encodeURIComponent(message)}`;
 }

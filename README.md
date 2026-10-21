@@ -46,7 +46,7 @@ npm run dev               # http://localhost:4321 (con los datos provisionales r
 
 | Variable | Ejemplo | Uso |
 |---|---|---|
-| `SITE_URL` | `https://osuna-visitas.pages.dev` | URL pública, sin barra final. Se usa en canonical, hreflang, sitemap, `robots.txt` y Open Graph. |
+| `SITE_URL` | `https://turismo-osuna-web.pedritosc2000.workers.dev` | URL pública, sin barra final. Se usa en canonical, hreflang, sitemap, `robots.txt` y Open Graph. |
 | `PUBLIC_CF_ANALYTICS_TOKEN` | *(vacío)* | Token de Cloudflare Web Analytics. Vacío = analítica desactivada. Solo se carga en producción. |
 
 ---
@@ -130,11 +130,13 @@ La web es 100 % estática: el resultado de `npm run build` es la carpeta `dist/`
    - *Project name*: `turismo-osuna-web` (debe coincidir con `name` en `wrangler.jsonc`)
    - *Build command*: `npm run build`
    - *Deploy command*: `npx wrangler deploy`
-   - *Non-production branch deploy command*: `npx wrangler versions upload`
+   - *Preview command* (en algunos paneles, *Non-production branch deploy command*): `npx wrangler versions upload`
    - *Path*: `/`
 3. **Variables de build** (*Settings → Build → Variables and secrets*; son de **build**, no de runtime):
    - `NODE_VERSION` = `24`
-   - `SITE_URL` = la URL pública (al principio, la `https://turismo-osuna-web.<tu-subdominio>.workers.dev` que te asigne Cloudflare; luego, el dominio)
+   - `SITE_URL` = *(opcional)* la URL pública. Si no se define, se usa la de `astro.config.mjs` (`https://turismo-osuna-web.pedritosc2000.workers.dev`, la URL de **demostración** para el cliente). Defínela al pasar al dominio definitivo.
+
+   > **Indexación.** Mientras la URL sea `*.workers.dev` o `*.pages.dev`, todas las páginas llevan `<meta name="robots" content="noindex">` y los buscadores no las indexan (los datos aún son provisionales). Al poner en `SITE_URL` el dominio definitivo, la web pasa a ser indexable sola; `npm run verify` comprueba las dos situaciones.
    - `PUBLIC_CF_ANALYTICS_TOKEN` = *(opcional, ver analítica)*
 4. Cada `git push` a `main` publica en producción; las demás ramas suben una versión de vista previa con su propia URL.
 

@@ -33,7 +33,7 @@ Hemos intentado que sea rápido: en casi todas las preguntas basta con **marcar 
 | 17 | Calor y lluvia | De junio a septiembre, salidas temprano y al atardecer; con aviso naranja/rojo o lluvia fuerte, cambio de fecha o anulación sin coste | Preguntas frecuentes |
 | 18 | Cancelación | Gratis avisando con 24 h (grupos y colegios: 72 h) | Preguntas frecuentes |
 | 19 | Conservación de datos | Conversaciones sin reserva se borran a los 12 meses | Política de privacidad |
-| 20 | Dirección web | osuna-visitas.pages.dev | Toda la web (enlaces internos, buscadores) |
+| 20 | Dirección web | turismo-osuna-web.pedritosc2000.workers.dev | Toda la web (enlaces internos, buscadores) |
 | 21 | Logo del Ayuntamiento | Recuadro vacío con el texto «Con la colaboración del Ayuntamiento de Osuna» | Pie de página |
 | 22 | Foto de la ruta nocturna | Una vista de Osuna de día convertida a tonos azules (no es una foto nocturna real) | Ruta «Osuna nocturna» |
 | 23 | Foto del teatro romano | No encontramos ninguna con licencia libre; usamos fotos de Las Canteras y la necrópolis | Ruta de Las Canteras |
