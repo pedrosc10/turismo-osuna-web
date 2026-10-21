@@ -53,6 +53,14 @@ const { tone = 'ink' } = Astro.props;
     letter-spacing: -0.01em;
     white-space: nowrap;
   }
+  @media (max-width: 23.99rem) {
+    .logo__name {
+      font-size: 1.08rem;
+    }
+    .logo__mark {
+      width: 22px;
+    }
+  }
   .logo__tag {
     font-family: var(--sans);
     font-size: 0.66rem;

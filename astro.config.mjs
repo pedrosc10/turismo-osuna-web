@@ -14,7 +14,7 @@ const SITE_URL = env.SITE_URL || 'https://osuna-visitas.pages.dev'; // TODO-V2: 
 export default defineConfig({
   site: SITE_URL,
   trailingSlash: 'always',
-  build: { format: 'directory' },
+  build: { format: 'directory', inlineStylesheets: 'always' },
   i18n: {
     locales: ['es', 'en', 'de'],
     defaultLocale: 'es',

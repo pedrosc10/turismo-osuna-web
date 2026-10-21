@@ -63,6 +63,9 @@ const tr = t(locale);
   .hero__media {
     margin: 0;
   }
+  .hero__media .fig {
+    display: none;
+  }
   .hero__media :global(.hero__picture) {
     display: block;
     aspect-ratio: 4 / 4.4;
@@ -163,7 +166,7 @@ const tr = t(locale);
 
   @media (min-width: 64rem) {
     .hero {
-      padding: 40px 0 96px;
+      padding: 40px 0 48px;
     }
     .hero__grid {
       grid-template-columns: repeat(12, minmax(0, 1fr));
@@ -173,6 +176,9 @@ const tr = t(locale);
     .hero__media {
       grid-column: 7 / 13;
       grid-row: 1;
+    }
+    .hero__media .fig {
+      display: block;
     }
     .hero__media :global(.hero__picture) {
       aspect-ratio: 5 / 6.2;

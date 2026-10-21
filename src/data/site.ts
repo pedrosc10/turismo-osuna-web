@@ -119,15 +119,15 @@ export const gallery = [
   'colegiata-iglesia',
   'encarnacion-azulejo',
   'colegiata-panteon',
-  'universidad-patio',
   'aldaba',
+  'universidad-patio',
   'san-pedro-calle',
   'colegiata-techumbre',
   'canteras-interior',
   'casa-de-los-torres',
   'tumbas-romanas',
-  'plaza-toros-panoramica',
   'tejados',
+  'plaza-toros-panoramica',
 ];
 
 /** Enlace de WhatsApp con mensaje prerrellenado. */

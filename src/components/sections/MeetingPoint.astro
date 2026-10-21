@@ -33,7 +33,7 @@ const mp = site.meetingPoint;
       <address class="meet__address">
         <Todo>
           <strong>{mp.name}</strong><br />
-          {mp.streetAddress} · {mp.postalCode} {mp.locality} ({mp.region})
+          {`${mp.streetAddress} · ${mp.postalCode} ${mp.locality} (${mp.region})`}
         </Todo>
       </address>
       <a class="textlink" href={directionsUrl} target="_blank" rel="noopener">
@@ -176,10 +176,16 @@ const mp = site.meetingPoint;
 </style>
 
 <script>
+  import leafletCss from 'leaflet/dist/leaflet.css?url';
   const el = document.querySelector<HTMLElement>('[data-map]');
   if (el) {
     const init = async () => {
-      const [{ default: L }] = await Promise.all([import('leaflet'), import('leaflet/dist/leaflet.css')]);
+      // La hoja de estilos de Leaflet se carga solo cuando hace falta (no bloquea el primer render)
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = leafletCss;
+      document.head.append(link);
+      const { default: L } = await import('leaflet');
       const lat = Number(el.dataset.lat);
       const lng = Number(el.dataset.lng);
       const map = L.map(el, { scrollWheelZoom: false, zoomControl: true }).setView([lat, lng], 17);

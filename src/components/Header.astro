@@ -56,7 +56,7 @@ const items = [
     </nav>
 
     <div class="site-header__tools">
-      <LangSwitcher pageKey={pageKey} />
+      <LangSwitcher pageKey={pageKey} compact />
       <a class="btn site-header__cta" href={whatsappUrl(tr.wa.general)} target="_blank" rel="noopener">
         <Icon name="whatsapp" />
         <span class="site-header__cta-text">{tr.cta.whatsapp}</span>
@@ -126,6 +126,22 @@ const items = [
   .site-header__menu svg {
     width: 20px;
     height: 20px;
+  }
+  @media (max-width: 29.99rem) {
+    .site-header__menu-label {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+    }
+    .site-header__menu {
+      padding: 8px;
+    }
+    .site-header__inner {
+      gap: 8px;
+    }
   }
 
   /* Navegación — móvil: panel desplegable a pantalla completa */

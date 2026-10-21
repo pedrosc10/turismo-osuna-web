@@ -84,7 +84,7 @@ const es = {
     sun: 'Domingos',
   },
   scheduleValue: (days: string, times: readonly string[]) =>
-    `${days.charAt(0).toUpperCase() + days.slice(1)}, ${times.join(' y ')} h`,
+    `${days.charAt(0).toUpperCase() + days.slice(1)}, ${times.join(' y ')} h`,
 
   routes: {
     colegiata: {

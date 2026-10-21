@@ -1,9 +1,10 @@
 ---
-import '@fontsource-variable/fraunces/opsz.css';
-import '@fontsource-variable/fraunces/opsz-italic.css';
+import '@fontsource-variable/fraunces/wght.css';
+import '@fontsource-variable/fraunces/wght-italic.css';
 import '@fontsource-variable/source-sans-3/wght.css';
 import '../styles/global.css';
-import frauncesLatin from '@fontsource-variable/fraunces/files/fraunces-latin-opsz-normal.woff2?url';
+import frauncesLatin from '@fontsource-variable/fraunces/files/fraunces-latin-wght-normal.woff2?url';
+import frauncesItalic from '@fontsource-variable/fraunces/files/fraunces-latin-wght-italic.woff2?url';
 import sansLatin from '@fontsource-variable/source-sans-3/files/source-sans-3-latin-wght-normal.woff2?url';
 
 import Header from '../components/Header.astro';
@@ -57,6 +58,7 @@ const loadAnalytics = import.meta.env.PROD && analyticsToken.length > 0;
 
     <link rel="preload" href={frauncesLatin} as="font" type="font/woff2" crossorigin />
     <link rel="preload" href={sansLatin} as="font" type="font/woff2" crossorigin />
+    {isHome && <link rel="preload" href={frauncesItalic} as="font" type="font/woff2" crossorigin />}
 
     <!-- Open Graph / Twitter -->
     <meta property="og:type" content="website" />

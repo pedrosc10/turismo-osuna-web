@@ -80,7 +80,7 @@ const de: Dict = {
     monSat: 'Montag bis Samstag',
     sun: 'Sonntag',
   },
-  scheduleValue: (days: string, times: readonly string[]) => `${days}, ${times.join(' und ')} Uhr`,
+  scheduleValue: (days: string, times: readonly string[]) => `${days}, ${times.join(' und ')} Uhr`,
 
   routes: {
     colegiata: {

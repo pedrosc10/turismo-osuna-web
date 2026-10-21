@@ -1,7 +1,8 @@
 ---
 /**
- * Cenefa geométrica inspirada en el alicatado sevillano (estrella de ocho puntas en retícula).
- * Se usa exactamente dos veces (DESIGN.md §6.4). Puramente decorativa.
+ * Cenefa geométrica inspirada en el alicatado sevillano: estrella de ocho puntas formada por
+ * dos cuadrados girados, con cuartos de rombo en las esquinas que, al repetirse, dibujan
+ * pequeños rombos entre estrellas. Se usa exactamente dos veces (DESIGN.md §6.4). Decorativa.
  */
 interface Props {
   id: string;
@@ -10,24 +11,24 @@ interface Props {
 const { id, class: className } = Astro.props;
 ---
 
-<svg class:list={['azulejo', className]} width="100%" height="36" aria-hidden="true" focusable="false">
+<svg class:list={['azulejo', className]} width="100%" height="32" aria-hidden="true" focusable="false">
   <defs>
-    <pattern id={id} width="36" height="36" patternUnits="userSpaceOnUse">
-      <rect width="36" height="36" fill="var(--az-bg, #f2eadb)"></rect>
-      <path
-        d="M18 3 21.5 10.5 29 7 25.5 14.5 33 18 25.5 21.5 29 29 21.5 25.5 18 33 14.5 25.5 7 29 10.5 21.5 3 18 10.5 14.5 7 7 14.5 10.5Z"
-        fill="var(--az-star, #a3401f)"></path>
-      <circle cx="18" cy="18" r="3.4" fill="var(--az-bg, #f2eadb)"></circle>
-      <path d="M0 0h6L0 6zM36 0h-6l6 6zM0 36h6l-6-6zM36 36h-6l6-6z" fill="var(--az-corner, #4e5631)"></path>
+    <pattern id={id} width="32" height="32" patternUnits="userSpaceOnUse">
+      <rect width="32" height="32" fill="var(--az-bg, #f2eadb)"></rect>
+      <rect x="8" y="8" width="16" height="16" fill="var(--az-star, #a3401f)"></rect>
+      <rect x="8" y="8" width="16" height="16" fill="var(--az-star, #a3401f)" transform="rotate(45 16 16)"></rect>
+      <rect x="13" y="13" width="6" height="6" fill="var(--az-bg, #f2eadb)" transform="rotate(45 16 16)"></rect>
+      <path d="M0 0h5L0 5zM32 0h-5l5 5zM0 32h5l-5-5zM32 32h-5l5-5z" fill="var(--az-corner, #4e5631)"></path>
+      <path d="M0 16h2M30 16h2M16 0v2M16 30v2" stroke="var(--az-corner, #4e5631)" stroke-width="1.5"></path>
     </pattern>
   </defs>
-  <rect width="100%" height="36" fill={`url(#${id})`}></rect>
+  <rect width="100%" height="32" fill={`url(#${id})`}></rect>
 </svg>
 
 <style>
   .azulejo {
     display: block;
     width: 100%;
-    height: 36px;
+    height: 32px;
   }
 </style>

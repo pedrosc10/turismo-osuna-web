@@ -53,7 +53,12 @@ const c = tr.custom;
 
 <style>
   .custom {
-    padding-bottom: 0;
+    padding-top: 56px;
+  }
+  @media (min-width: 64rem) {
+    .custom {
+      padding-top: 96px;
+    }
   }
   .custom__band :global(.custom__picture) {
     display: block;
@@ -86,9 +91,6 @@ const c = tr.custom;
   }
   .custom__head h2 {
     font-size: var(--step-3);
-  }
-  .custom__head h2::first-line {
-    font-style: normal;
   }
   .custom__list {
     list-style: none;
