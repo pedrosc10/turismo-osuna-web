@@ -1,6 +1,6 @@
 # DESIGN.md — Dirección visual
 
-> Proyecto: web de visitas guiadas en Osuna (v1). Este documento se escribió **antes** de maquetar la interfaz y se ha seguido como guía. Al final está el registro de cambios tras la revisión con capturas.
+> Proyecto: web de visitas guiadas en Osuna. Las secciones 1–10 son la dirección visual de la v1 (escrita **antes** de maquetar) y su registro de cambios; siguen vigentes. La sección 11 recoge los cambios de la v2 (web multipágina e inicio corto).
 
 ## 1. Concepto: «Cuaderno de piedra»
 
@@ -114,3 +114,62 @@ Revisé las capturas de `reports/screenshots/` (375, 768, 1280 y 1920 px, en los
 Además, por rendimiento (Lighthouse móvil 91 → 98): CSS en línea en el HTML, la hoja de Leaflet se carga solo al llegar al mapa, Fraunces pasa del archivo con eje óptico (67 + 82 KB) al de peso (37 + 46 KB) y se ajustó la calidad AVIF. Visualmente no hay diferencia apreciable.
 
 **Crítica anti-plantilla, resultado final:** el hero no está centrado ni oscurecido, y la foto en arco es la firma; las siete rutas usan cuatro composiciones distintas; no hay iconos decorativos (solo WhatsApp, teléfono y los controles de la galería); no hay sombras difusas, degradados ni esquinas redondeadas salvo el arco; y cada sección tiene su propio ritmo y su propio fondo (piedra, piedra oscura, papel, noche). La sección más «estándar» sigue siendo la FAQ, que he dejado sobria a propósito: título fijo en la columna de margen y filetes numerados, sin cajas.
+
+---
+
+## 11. Versión 2: de una página a muchas, y un inicio corto
+
+La v2 cambia la arquitectura (ver `PROMPT-V2.md`): el inicio pasa de ser la web entera a ser un **resumen que lleva a las páginas de ruta**. La dirección visual («Cuaderno de piedra») no cambia; lo que cambia es dónde vive cada cosa.
+
+### 11.1. Longitud del inicio
+
+Medido con `npm run screenshots` (Playwright, 375 px de ancho; «pantalla» = 812 px, el alto útil de un iPhone de tamaño medio). Ver `reports/v2/screenshots/ALTURAS.md`.
+
+| | v1 | v2 |
+|---|---|---|
+| Español | 15.329 px (18,9 pantallas) | 4.014 px (4,9 pantallas) |
+| Inglés | 15.298 px (18,8) | 3.962 px (4,9) |
+| Alemán | 15.684 px (19,3) | 4.068 px (5,0) |
+
+En las dos primeras pantallas se ve qué se ofrece (titular, hero, idiomas, credencial, «entradas incluidas» y el arranque del índice de rutas) y cómo reservar (WhatsApp y «Llamar»; además, el botón flotante).
+
+### 11.2. Qué cambió en el inicio y por qué
+
+| Antes (v1) | Ahora (v2) | Por qué |
+|---|---|---|
+| 7 rutas con cuatro composiciones grandes (destacada, pareja, índice, noche), cada una con ficha y botón | **Índice de itinerarios** compacto: numeral romano, nombre, una frase y una miniatura, todo un enlace a su página. La VII sigue rompiendo en azul noche | La ficha completa vive ahora en la página de cada ruta. El índice conserva la firma de la v1 (numerales romanos, filetes, la noche como ruptura) sin ser una rejilla de tarjetas |
+| Banda panorámica + panel con cuatro públicos | Bloque de **dos líneas** con la cenefa, CTA de WhatsApp y enlace a «Visitas a medida» | El detalle está en su página |
+| Galería de 12 fotos con lightbox | **Fuera del inicio.** Las fotos se reparten por las páginas de ruta (3–5 por ruta, con encuadres variados) | Era la sección que más alargaba la página y no llevaba a reservar. En las rutas las fotos ilustran lo que se cuenta y son entrada desde Google Imágenes |
+| FAQ de 9 preguntas | **5 preguntas** + «Todas las preguntas» | La página de FAQ tiene las 13 generales |
+| Mapa (7/12) y contacto en dos secciones | **Una sola sección** «Contacto y punto de encuentro», con el mapa debajo en móvil y al lado en escritorio | Menos scroll; el mapa en móvil baja a 176 px |
+| — | **Franja «Lo esencial»**: 3 h · 30 personas · 24 h · entradas · reserva | Las cifras que más se preguntan, como cartela de museo (serif grande + filete), sin iconos |
+| Línea de idiomas en el hero | Línea de distintivos: **ES · EN · DE · IT**, «Guía oficial GT/00975», «Entradas incluidas» | Pedido en el encargo; la credencial es una señal de confianza que la competencia no tiene |
+| Pie con recuadro del Ayuntamiento | Pie con la credencial, **las 7 rutas** enlazadas y los enlaces legales. El recuadro del Ayuntamiento queda en `CouncilCredit.astro`, desactivado | Decisión de la clienta; las rutas en el pie evitan páginas huérfanas. En el inicio no se repiten (están justo encima) |
+
+### 11.3. Páginas nuevas
+
+- **Ruta** (`RoutePage.astro`): cabecera con migas de pan, foto principal (en arco para I y IV, como en la v1), numeral, `h1`, texto validado, CTA de WhatsApp con el mensaje de esa ruta y «Llamar», y la credencial. Debajo, la **ficha rápida** como cartela de museo (en escritorio, fija en la columna de margen, como las etiquetas de una guía impresa) y el texto en la columna ancha, con las fotos intercaladas: una apaisada tras el primer apartado y una pareja desfasada (vertical + cuadrada, y una panorámica si hay tercera). Recorrido numerado con filetes, recuadro «En familia» con filete oliva, preguntas, cierre «¿Reservamos?» y «Otras rutas» con el mismo índice del inicio. La ruta nocturna invierte la cabecera y el cierre en azul noche.
+- **Visitas a medida**: banda panorámica a sangre con la cenefa (segunda y última aparición en esa página, junto con la del pie), públicos y pasos como listas con filetes, ficha y las 7 rutas para combinar.
+- **Preguntas frecuentes**: título fijo en la columna de margen (como la FAQ de la v1) y las preguntas agrupadas en tres bloques con numeración continua.
+
+### 11.4. Revisión con capturas (v2) y cambios
+
+| # | Qué vi | Qué cambié |
+|---|---|---|
+| 1 | El inicio en móvil medía 5.065 px (6,2 pantallas). Las frases de cada ruta ocupaban 3–4 líneas | Frases de ≤ 60 caracteres en los 3 idiomas, miniaturas de 64 px y espaciados más ajustados |
+| 2 | Seguía en 5,5 pantallas | «A medida» reducido a las dos líneas del encargo; sin la lista de rutas en el pie del inicio; datos clave en 3 + 2 columnas; ficha de contacto en dos columnas |
+| 3 | La línea de distintivos del hero partía con un «·» al principio de renglón | En móvil, idiomas a la izquierda y los dos distintivos apilados a la derecha; separadores solo desde 768 px |
+| 4 | El horario partía «17:00–20:30» por el guion | Horas sin salto de línea |
+| 5 | En la ficha alemana, «GÄSTEFÜHRERIN» se partía letra a letra | Columna de etiquetas al 40 % y guionado en vez de corte arbitrario |
+| 6 | En «Visitas a medida», la cabecera no tenía margen lateral (un `padding` anulaba el del `.wrap`) | Corregido; además, `npm run screenshots` revisa ahora **todas** las páginas buscando texto a menos de 12 px del borde, porque la comprobación de desbordamiento no lo detectaba |
+| 7 | Esa nueva comprobación encontró que «Datenschutzerklärung» se cortaba en móvil (lo ocultaba `overflow-x: clip`) | Título de las páginas legales más pequeño en móvil y con corte de palabra |
+| 8 | En móvil, la foto en arco de la ruta empujaba el `h1` y el botón fuera de la primera pantalla | Arco más bajo en móvil (4:3,4) |
+| 9 | La panorámica de la Colegiata enseñaba sobre todo cielo | Encuadre desplazado hacia la villa |
+| 10 | Lighthouse móvil de la Colegiata: 93 (LCP 3,3 s, foto de la portada de 163 KB) | Calidad 40 y tamaños más ajustados para la foto principal de las rutas: 98. La diferencia visual no se aprecia a doble densidad |
+
+### 11.5. Crítica anti-plantilla (v2)
+
+- **Inicio:** el riesgo era que el índice de rutas acabara pareciendo una lista de tarjetas. No lo parece porque no hay cajas: son filas de un índice impreso, con numerales romanos finos, filetes y miniaturas de encuadres distintos (arco en I y IV, apaisadas en el resto, en escritorio). La VII sigue rompiendo en azul noche. La franja de datos clave es tipográfica (serif grande sobre filete), sin iconos.
+- **Página de ruta:** la plantilla es la misma para las siete rutas, lo que es inevitable y deseable en SEO, pero cada página varía en lo que más pesa visualmente: la foto (arco o recta, encuadres distintos de las fotos interiores) y, en la nocturna, todo el color de la cabecera y del cierre. Se mantiene la asimetría: columna de margen con la ficha y texto en la columna ancha.
+- **Lo más «estándar»:** el bloque de cierre «¿Reservamos?» es un patrón de llamada a la acción reconocible. Lo he dejado así a propósito, porque es el momento de reservar, pero sin degradados, sombras ni centrado: titular en cursiva a la izquierda y el teléfono grande a la derecha.
+- Siguen sin aparecer sombras difusas, degradados, iconos decorativos ni esquinas redondeadas (salvo el arco).
