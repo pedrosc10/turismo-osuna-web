@@ -100,7 +100,7 @@ h1 em{display:block;color:#a3401f;font-weight:320}
 </style></head><body>
 <div class="t"><p class="k">${esc(d.hero.kicker)}</p>
 <h1>${esc(d.meta.ogTitle.split(' ').slice(0, -1).join(' '))}<em>${esc(d.meta.ogTitle.split(' ').slice(-1)[0])}.</em></h1>
-<p class="l">${esc(d.meta.ogLine)}</p><p class="b">${esc(site.brand)} · ${esc(d.hero.badgesLabel)}</p></div>
+<p class="l">${esc(d.meta.ogLine)}</p><p class="b">${esc(site.brand)} · ${esc(d.hero.badges[0])}<br>${esc(d.hero.badges[1])} · ${esc(d.hero.badges[2])}</p></div>
 <div class="p"></div></body></html>`;
 
 await mkdir(pub('og'), { recursive: true });

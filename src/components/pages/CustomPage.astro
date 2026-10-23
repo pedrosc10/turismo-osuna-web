@@ -157,7 +157,8 @@ const jsonLd = [
 
 <style>
   .cp__head {
-    padding: 4px 0 32px;
+    padding-top: 4px;
+    padding-bottom: 32px;
   }
   .cp__crumbs,
   .cp__intro {
@@ -276,6 +277,13 @@ const jsonLd = [
     text-transform: uppercase;
     color: var(--ink-2);
   }
+  .cp__facts .cartela {
+    grid-template-columns: minmax(6.5rem, 40%) 1fr;
+  }
+  .cp__facts .cartela dt {
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
   .cp__more {
     margin-top: 12px;
   }
@@ -299,7 +307,8 @@ const jsonLd = [
   }
   @media (min-width: 64rem) {
     .cp__head {
-      padding: 8px 0 56px;
+      padding-top: 8px;
+      padding-bottom: 56px;
     }
     .cp__intro {
       grid-column: 1 / 10;

@@ -1,0 +1,4 @@
+# Carpetas de las páginas de ruta: no tienen índice propio; llevan al índice de rutas del inicio de cada idioma.
+/rutas/            /#rutas      301
+/en/tours/         /en/#rutas   301
+/de/fuehrungen/    /de/#rutas   301

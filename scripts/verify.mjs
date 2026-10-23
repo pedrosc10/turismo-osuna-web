@@ -128,7 +128,8 @@ for (const [url, html] of pages) {
     }
   }
   if (/fonts\.googleapis|google\.com\/maps\/embed|youtube\.com\/embed/.test(html)) err(url, 'embed de Google/YouTube');
-  if (/href="http:\/\//.test(html)) err(url, 'enlace http:// (sin https)');
+  // Enlaces http:// (la competencia los mezcla); se excluye el propio sitio cuando se compila contra http://localhost
+  for (const m of html.matchAll(/<a\b[^>]*\shref="(http:\/\/[^"]*)"/g)) if (!m[1].startsWith(site)) err(url, `enlace http:// (sin https): ${m[1]}`);
 
   // Enlaces
   const ids = new Set([...html.matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]));

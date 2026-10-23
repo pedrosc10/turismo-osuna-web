@@ -9,7 +9,7 @@ import { sitemapLinks } from './src/i18n/pages.mjs';
 // Mientras no haya dominio se usa la URL de demostración en workers.dev (para enseñársela al cliente).
 // Con una URL *.workers.dev o *.pages.dev todas las páginas llevan noindex (ver isPreviewSite en src/data/site.ts).
 const env = loadEnv(process.env.NODE_ENV ?? 'production', process.cwd(), '');
-const SITE_URL = env.SITE_URL || 'https://turismo-osuna-web.pedritosc2000.workers.dev'; // TODO-V2: dato provisional (dominio)
+const SITE_URL = env.SITE_URL || 'https://turismo-osuna-web.pedritosc2000.workers.dev'; // PENDIENTE: dominio definitivo (ver SEO-PLAN.md, apartado «Dominio»)
 
 // https://astro.build/config
 export default defineConfig({

@@ -56,10 +56,12 @@ const jsonLd = [
     grid-column: 1 / -1;
   }
   .prose-page__head h1 {
-    font-size: var(--step-4);
+    /* Más pequeño que step-4 en móvil: «Datenschutzerklärung» no cabía a 375 px */
+    font-size: clamp(2.2rem, 1.6rem + 3vw, 5.5rem);
     font-weight: 300;
     margin-bottom: 12px;
     hyphens: auto;
+    overflow-wrap: break-word;
   }
   .prose-page__date {
     font-family: var(--serif);

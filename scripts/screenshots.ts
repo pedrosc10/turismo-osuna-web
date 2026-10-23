@@ -63,6 +63,41 @@ for (const [name, path] of pages) {
     await page.close();
   }
 }
+// Segunda pasada: todas las páginas del sitemap a 375 y 1280 px, buscando texto pegado al borde
+// (menos de 12 px) o que se sale de la pantalla. No hace capturas.
+if (!only) {
+  const sitemap = await (await fetch(`${base}/sitemap-0.xml`)).text();
+  const urls = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => new URL(m[1]).pathname);
+  for (const width of [375, 1280]) {
+    const page = await browser.newPage({ viewport: { width, height: 812 } });
+    for (const path of urls) {
+      await page.goto(base + path, { waitUntil: 'load' });
+      const bad = await page.evaluate(() => {
+        const w = document.documentElement.clientWidth;
+        const res: string[] = [];
+        const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+        for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+          const el = n.parentElement!;
+          if (!n.textContent!.trim() || el.closest('.visually-hidden, .leaflet-container, .wa-float, .skip-link, dialog')) continue;
+          const st = getComputedStyle(el);
+          if (st.visibility === 'hidden' || st.display === 'none' || el.offsetParent === null) continue;
+          const range = document.createRange();
+          range.selectNodeContents(n);
+          for (const r of range.getClientRects()) {
+            if (r.width > 0 && (r.left < 12 || r.right > w - 12)) {
+              res.push(`«${n.textContent!.trim().slice(0, 30)}» ${Math.round(r.left)}..${Math.round(r.right)}`);
+              break;
+            }
+          }
+        }
+        return res.slice(0, 3);
+      });
+      if (bad.length) problems.push(`${path} @${width}: texto pegado al borde: ${bad.join(' | ')}`);
+    }
+    await page.close();
+  }
+  console.log(`Comprobación de bordes: ${urls.length} páginas × 2 anchos.`);
+}
 await browser.close();
 const table = `| Página | Alto a 375 px | Pantallas de ${PHONE_H} px |\n|---|---|---|\n${heights.join('\n')}\n`;
 if (!only) await writeFile(`${out}/ALTURAS.md`, `# Altura de las páginas en móvil\n\n${table}`);

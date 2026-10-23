@@ -85,8 +85,9 @@ const jsonLd = [
           <Photo
             name={route.image}
             alt={tr.alt[route.image]}
-            sizes="(min-width: 64rem) 42vw, 100vw"
-            widths={[480, 720, 960, 1280, 1600]}
+            sizes="(min-width: 64rem) 42vw, (min-width: 48rem) 78vw, calc(100vw - 40px)"
+            widths={[400, 560, 720, 960, 1280, 1600]}
+            quality={40}
             eager
             pictureClass={route.arch ? 'rp__picture arch' : 'rp__picture'}
             class="rp__img"
@@ -235,7 +236,7 @@ const jsonLd = [
     background: var(--stone-2);
   }
   .rp__media :global(.rp__picture.arch) {
-    aspect-ratio: 4 / 4.2;
+    aspect-ratio: 4 / 3.4;
   }
   .rp__media :global(.rp__img) {
     width: 100%;

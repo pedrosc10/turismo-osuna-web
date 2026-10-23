@@ -14,10 +14,12 @@ interface Props {
   eager?: boolean;
   class?: string;
   pictureClass?: string;
+  /** Calidad de compresión; por defecto 50 (hero) o 52 (resto). */
+  quality?: number;
 }
 
 const photos = import.meta.glob<{ default: ImageMetadata }>('../assets/photos/*.jpg', { eager: true });
-const { name, alt, sizes, widths = [480, 800, 1200, 1600, 2000], eager = false, class: className, pictureClass } = Astro.props;
+const { name, alt, sizes, widths = [480, 800, 1200, 1600, 2000], eager = false, class: className, pictureClass, quality } = Astro.props;
 const mod = photos[`../assets/photos/${name}.jpg`];
 if (!mod) throw new Error(`Foto no encontrada: ${name}`);
 const img = mod.default;
@@ -31,7 +33,7 @@ const usable = widths.filter((w) => w <= img.width);
   sizes={sizes}
   formats={['avif', 'webp']}
   fallbackFormat="jpg"
-  quality={eager ? 50 : 52}
+  quality={quality ?? (eager ? 50 : 52)}
   loading={eager ? 'eager' : 'lazy'}
   decoding={eager ? 'sync' : 'async'}
   fetchpriority={eager ? 'high' : 'auto'}
