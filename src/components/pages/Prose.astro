@@ -1,20 +1,32 @@
 ---
 /** Páginas de texto legal (aviso legal, privacidad, cookies). Todo el contenido viene de i18n. */
 import Base from '../../layouts/Base.astro';
-import Todo from '../Todo.astro';
-import { t, asLocale, type PageKey } from '../../i18n';
+import Breadcrumbs from '../Breadcrumbs.astro';
+import { t, asLocale, pagePath, type PageKey } from '../../i18n';
+import { breadcrumbNode, webPageNode, type Crumb } from '../../lib/seo';
 
 interface Props {
   page: Extract<PageKey, 'legal' | 'privacy' | 'cookies'>;
 }
 const { page } = Astro.props;
-const tr = t(asLocale(Astro.currentLocale));
+const locale = asLocale(Astro.currentLocale);
+const tr = t(locale);
 const doc = tr[page];
+const siteUrl = (Astro.site?.toString() ?? '').replace(/\/$/, '');
+const crumbs: Crumb[] = [
+  { name: tr.nav.home, key: 'home' },
+  { name: doc.title, key: page },
+];
+const jsonLd = [
+  webPageNode(siteUrl, `${siteUrl}${pagePath(page, locale)}`, doc.metaTitle, doc.metaDesc, tr.locale),
+  breadcrumbNode(siteUrl, locale, crumbs),
+];
 ---
 
-<Base title={doc.metaTitle} description={doc.metaDesc} pageKey={page}>
+<Base title={doc.metaTitle} description={doc.metaDesc} pageKey={page} jsonLd={jsonLd}>
   <article class="wrap grid prose-page">
     <header class="prose-page__head">
+      <Breadcrumbs crumbs={crumbs} />
       <p class="kicker">{tr.footer.legalNav}</p>
       <h1>{doc.title}</h1>
       <p class="prose-page__date">{tr.lastUpdated}</p>
@@ -24,15 +36,9 @@ const doc = tr[page];
         doc.sections.map((s) => (
           <section>
             <h2>{s.h}</h2>
-            {'todo' in s && s.todo ? (
-              <Todo block>
-                {s.p.map((para) => (
-                  <p>{para}</p>
-                ))}
-              </Todo>
-            ) : (
-              s.p.map((para) => <p>{para}</p>)
-            )}
+            {s.p.map((para) => (
+              <p>{para}</p>
+            ))}
           </section>
         ))
       }
@@ -42,7 +48,7 @@ const doc = tr[page];
 
 <style>
   .prose-page {
-    padding-top: 56px;
+    padding-top: 16px;
     padding-bottom: 104px;
   }
   .prose-page__head,
@@ -78,7 +84,7 @@ const doc = tr[page];
   }
   @media (min-width: 64rem) {
     .prose-page {
-      padding-top: 96px;
+      padding-top: 32px;
     }
     .prose-page__head {
       grid-column: 1 / 5;

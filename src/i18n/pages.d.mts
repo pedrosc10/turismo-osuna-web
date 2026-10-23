@@ -1,7 +1,13 @@
+type L = 'es' | 'en' | 'de';
+type RouteId = 'colegiata' | 'universidad' | 'encarnacion' | 'sanpedro' | 'canteras' | 'cine' | 'nocturna';
+export type PageKey = 'home' | 'custom' | 'faq' | `route-${RouteId}` | 'credits' | 'legal' | 'privacy' | 'cookies';
 export declare const locales: readonly ['es', 'en', 'de'];
 export declare const defaultLocale: 'es';
-export declare const hreflang: Record<'es' | 'en' | 'de', string>;
-export declare const pages: Record<'home' | 'credits' | 'legal' | 'privacy' | 'cookies', Record<'es' | 'en' | 'de', string>>;
-export declare function pagePath(key: keyof typeof pages, locale: 'es' | 'en' | 'de'): string;
-export declare function pageKeyFromPath(path: string): keyof typeof pages | undefined;
+export declare const hreflang: Record<L, string>;
+export declare const routeBase: Record<L, string>;
+export declare const routeSlugs: Record<RouteId, Record<L, string>>;
+export declare const pages: Record<PageKey, Record<L, string>>;
+export declare function pagePath(key: PageKey, locale: L): string;
+export declare function routeStaticPaths(locale: L): { params: { slug: string }; props: { id: RouteId } }[];
+export declare function pageKeyFromPath(path: string): PageKey | undefined;
 export declare function sitemapLinks(url: string, site: string): { lang: string; url: string }[];

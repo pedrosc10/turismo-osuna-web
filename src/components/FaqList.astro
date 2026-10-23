@@ -1,0 +1,103 @@
+---
+/** Acordeón de preguntas con <details>, filetes y numeración (DESIGN.md §7). Sin JavaScript. */
+interface Props {
+  items: { q: string; a: string }[];
+  /** Nombre del grupo: con el mismo name solo queda abierta una pregunta a la vez. */
+  name: string;
+  /** Número de la primera pregunta (para seguir la numeración entre grupos). */
+  start?: number;
+}
+const { items, name, start = 1 } = Astro.props;
+---
+
+<div class="faq-list">
+  {
+    items.map((item, i) => (
+      <details class="faq-list__item" name={name}>
+        <summary>
+          <span class="faq-list__n" aria-hidden="true">
+            {String(start + i).padStart(2, '0')}
+          </span>
+          <span class="faq-list__q">{item.q}</span>
+          <span class="faq-list__toggle" aria-hidden="true" />
+        </summary>
+        <div class="faq-list__a">
+          <p>{item.a}</p>
+        </div>
+      </details>
+    ))
+  }
+</div>
+
+<style>
+  .faq-list {
+    border-top: 2px solid var(--ink);
+  }
+  .faq-list__item {
+    border-bottom: 1px solid var(--rule);
+  }
+  .faq-list__item summary {
+    list-style: none;
+    display: grid;
+    grid-template-columns: 2.2rem 1fr 24px;
+    align-items: baseline;
+    gap: 8px;
+    padding: 11px 0;
+    cursor: pointer;
+    min-height: 48px;
+  }
+  .faq-list__item summary::-webkit-details-marker {
+    display: none;
+  }
+  .faq-list__n {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: var(--terra);
+  }
+  .faq-list__q {
+    font-family: var(--serif);
+    font-size: 1.08rem;
+    font-weight: 420;
+    line-height: 1.3;
+  }
+  .faq-list__item summary:hover .faq-list__q {
+    color: var(--terra);
+  }
+  .faq-list__toggle {
+    position: relative;
+    width: 16px;
+    height: 16px;
+    align-self: center;
+  }
+  .faq-list__toggle::before,
+  .faq-list__toggle::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 7px;
+    width: 16px;
+    height: 1.5px;
+    background: var(--ink);
+    transition: transform 0.25s var(--ease);
+  }
+  .faq-list__toggle::after {
+    transform: rotate(90deg);
+  }
+  .faq-list__item[open] .faq-list__toggle::after {
+    transform: rotate(0deg);
+  }
+  .faq-list__a {
+    padding: 0 32px 20px 2.7rem;
+    max-width: 44rem;
+    color: var(--ink-2);
+  }
+  .faq-list__a p {
+    margin: 0;
+  }
+  @media (min-width: 64rem) {
+    .faq-list__q {
+      font-size: 1.28rem;
+    }
+  }
+</style>

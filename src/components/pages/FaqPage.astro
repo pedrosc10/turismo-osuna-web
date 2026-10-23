@@ -1,0 +1,127 @@
+---
+/**
+ * Página de preguntas frecuentes completa. Muestra todas las preguntas generales; su JSON-LD
+ * FAQPage solo incluye las que NO están en el inicio (esas van en el JSON-LD del inicio), para
+ * no duplicar preguntas entre páginas. Las preguntas de cada ruta están en su página.
+ */
+import Base from '../../layouts/Base.astro';
+import Breadcrumbs from '../Breadcrumbs.astro';
+import FaqList from '../FaqList.astro';
+import Icon from '../Icon.astro';
+import RouteRows from '../RouteRows.astro';
+import { t, asLocale, pagePath } from '../../i18n';
+import { whatsappUrl } from '../../data/site';
+import { breadcrumbNode, faqNode, webPageNode, type Crumb } from '../../lib/seo';
+
+const locale = asLocale(Astro.currentLocale);
+const tr = t(locale);
+const p = tr.faqPage;
+const siteUrl = (Astro.site?.toString() ?? '').replace(/\/$/, '');
+const pageUrl = `${siteUrl}${pagePath('faq', locale)}`;
+const crumbs: Crumb[] = [
+  { name: tr.nav.home, key: 'home' },
+  { name: p.kicker, key: 'faq' },
+];
+const groups = (['booking', 'visit', 'conditions'] as const).map((g) => ({
+  id: g,
+  title: p.groups[g],
+  items: tr.faq.filter((f) => f.group === g),
+}));
+const starts = groups.map((_, i) => 1 + groups.slice(0, i).reduce((n, g) => n + g.items.length, 0));
+
+const jsonLd = [
+  webPageNode(siteUrl, pageUrl, p.metaTitle, p.metaDesc, tr.locale),
+  breadcrumbNode(siteUrl, locale, crumbs),
+  faqNode(
+    `${pageUrl}#faq`,
+    tr.faq.filter((f) => !f.home),
+    tr.locale,
+  ),
+];
+---
+
+<Base title={p.metaTitle} description={p.metaDesc} pageKey="faq" jsonLd={jsonLd}>
+  <article class="wrap grid fp">
+    <header class="fp__head">
+      <Breadcrumbs crumbs={crumbs} />
+      <p class="kicker">{p.kicker}</p>
+      <h1>{p.h1}</h1>
+      <p class="lead">{p.lead}</p>
+      <a class="btn" href={whatsappUrl(tr.wa.general)} target="_blank" rel="noopener">
+        <Icon name="whatsapp" />
+        {tr.cta.whatsapp}
+        <span class="visually-hidden">{tr.cta.newTab}</span>
+      </a>
+    </header>
+    <div class="fp__body">
+      {
+        groups.map((g, i) => (
+          <section class="fp__group" aria-labelledby={`g-${g.id}`}>
+            <h2 id={`g-${g.id}`}>{g.title}</h2>
+            <FaqList items={g.items} name={`faq-${g.id}`} start={starts[i]} />
+          </section>
+        ))
+      }
+      <section class="fp__routes" aria-labelledby="fp-routes">
+        <h2 id="fp-routes">{tr.home.routesTitle}</h2>
+        <p>{p.more}</p>
+        <RouteRows />
+      </section>
+    </div>
+  </article>
+</Base>
+
+<style>
+  .fp {
+    padding-top: 4px;
+    padding-bottom: 88px;
+  }
+  .fp__head,
+  .fp__body {
+    grid-column: 1 / -1;
+  }
+  .fp__head h1 {
+    font-size: clamp(2rem, 1.5rem + 2.4vw, 3.4rem);
+    font-weight: 340;
+    line-height: 1.04;
+    letter-spacing: -0.02em;
+    margin-bottom: 16px;
+    hyphens: auto;
+  }
+  .fp__head .lead {
+    max-width: 34rem;
+  }
+  .fp__body {
+    margin-top: 40px;
+  }
+  .fp__group {
+    margin-bottom: 40px;
+  }
+  .fp__group h2,
+  .fp__routes h2 {
+    font-size: var(--step-2);
+    margin-bottom: 14px;
+  }
+  .fp__routes p {
+    color: var(--ink-2);
+  }
+  @media (min-width: 64rem) {
+    .fp {
+      padding-top: 8px;
+      padding-bottom: 120px;
+    }
+    .fp__head {
+      grid-column: 1 / 5;
+      position: sticky;
+      top: calc(var(--header-h) + 24px);
+      align-self: start;
+    }
+    .fp__head h1 {
+      font-size: var(--step-3);
+    }
+    .fp__body {
+      grid-column: 6 / 13;
+      margin-top: 56px;
+    }
+  }
+</style>

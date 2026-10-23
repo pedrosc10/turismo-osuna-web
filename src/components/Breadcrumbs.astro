@@ -1,0 +1,73 @@
+---
+/** Migas de pan visibles. Su JSON-LD (BreadcrumbList) lo genera la página con breadcrumbNode(). */
+import { t, asLocale, pagePath } from '../i18n';
+import type { Crumb } from '../lib/seo';
+
+interface Props {
+  crumbs: Crumb[];
+  tone?: 'ink' | 'light';
+}
+const { crumbs, tone = 'ink' } = Astro.props;
+const locale = asLocale(Astro.currentLocale);
+const tr = t(locale);
+---
+
+<nav class:list={['crumbs', `crumbs--${tone}`]} aria-label={tr.nav.breadcrumb}>
+  <ol>
+    {
+      crumbs.map((c, i) =>
+        i < crumbs.length - 1 ? (
+          <li>
+            <a href={pagePath(c.key, locale)}>{c.name}</a>
+          </li>
+        ) : (
+          <li aria-current="page">{c.name}</li>
+        ),
+      )
+    }
+  </ol>
+</nav>
+
+<style>
+  .crumbs ol {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    list-style: none;
+    font-size: var(--step--1);
+    color: var(--ink-2);
+  }
+  .crumbs li {
+    display: inline-flex;
+    align-items: center;
+    min-width: 0;
+  }
+  .crumbs li + li::before {
+    content: '/';
+    margin: 0 10px;
+    color: var(--rule);
+  }
+  .crumbs a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    color: var(--ink-2);
+    text-decoration-color: var(--terra);
+  }
+  .crumbs a:hover {
+    color: var(--terra);
+  }
+  .crumbs [aria-current] {
+    font-family: var(--serif);
+    font-style: italic;
+    color: var(--ink);
+  }
+  .crumbs--light,
+  .crumbs--light a,
+  .crumbs--light [aria-current] {
+    color: var(--night-ink);
+  }
+  .crumbs--light li + li::before {
+    color: var(--night-mute);
+  }
+</style>

@@ -1,0 +1,79 @@
+---
+/** Ficha rápida de una ruta (cartela de museo): duración, idiomas, encuentro, entradas, precio, grupo, días y guía. */
+import { t, asLocale } from '../i18n';
+import { site, type Route } from '../data/site';
+
+interface Props {
+  route: Route;
+  titleId: string;
+}
+const { route, titleId } = Astro.props;
+const locale = asLocale(Astro.currentLocale);
+const tr = t(locale);
+const f = tr.facts;
+// El idioma de la página va primero
+const ordered = [...site.tourLanguages].sort((a, b) => Number(b === locale) - Number(a === locale));
+const languages = tr.list(ordered.map((l) => tr.tourLangs[l]));
+const rows = [
+  [f.duration, f.durationValue],
+  [f.languages, languages.charAt(0).toUpperCase() + languages.slice(1)],
+  [f.meeting, route.ownTransport ? f.meetingOwnTransport : f.meetingValue],
+  [f.tickets, f.ticketsValue],
+  [f.price, f.priceValue],
+  [f.group, f.groupValue],
+  [f.booking, f.bookingValue],
+  [f.guide, f.guideValue],
+];
+---
+
+<div class="sheet">
+  <h2 id={titleId} class="sheet__title">{f.title}</h2>
+  <dl class="cartela sheet__list">
+    {
+      rows.map(([dt, dd]) => (
+        <div>
+          <dt>{dt}</dt>
+          <dd>{dd}</dd>
+        </div>
+      ))
+    }
+  </dl>
+</div>
+
+<style>
+  .sheet {
+    background: var(--paper);
+    padding: 18px 18px 6px;
+    margin: 0 calc(-1 * var(--margin));
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+  .sheet__title {
+    font-family: var(--sans);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+    margin-bottom: 10px;
+  }
+  .sheet__list {
+    grid-template-columns: minmax(6.5rem, 40%) 1fr;
+    border-top: 2px solid var(--ink);
+  }
+  .sheet__list dt {
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
+  .sheet__list > div:last-child dt,
+  .sheet__list > div:last-child dd {
+    border-bottom: 0;
+  }
+  @media (min-width: 48rem) {
+    .sheet {
+      margin: 0;
+      padding: 22px 24px 8px;
+      border: 1px solid var(--rule);
+    }
+  }
+</style>

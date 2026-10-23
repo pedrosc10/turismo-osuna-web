@@ -14,23 +14,31 @@ import { t, asLocale, locales, pagePath, hreflang, type PageKey } from '../i18n'
 import { site, isPreviewSite } from '../data/site';
 
 interface Props {
+  /** Título sin la marca: se añade « | Osuna Paso a Paso» al final. */
   title: string;
   description: string;
   /** Página (para hreflang y selector de idioma). Sin pageKey = página sin traducciones enlazadas (404). */
   pageKey?: PageKey;
   noindex?: boolean;
-  jsonLd?: object;
+  /** Nodos JSON-LD de la página; se publican juntos en un @graph. */
+  jsonLd?: object[];
+  /** Imagen para redes sociales (ruta absoluta desde la raíz, 1200×630). Por defecto, la del idioma. */
+  ogImage?: string;
+  /** Mensaje del botón flotante de WhatsApp (en las rutas, el de esa ruta). */
+  waMessage?: string;
   /** true en la portada: los enlaces de navegación son anclas locales. */
   isHome?: boolean;
 }
 
-const { title, description, pageKey, jsonLd, isHome = false } = Astro.props;
+const { description, pageKey, jsonLd, waMessage, isHome = false } = Astro.props;
 const noindex = Astro.props.noindex || isPreviewSite(Astro.site);
 const locale = asLocale(Astro.currentLocale);
 const tr = t(locale);
 const siteUrl = (Astro.site?.toString() ?? '').replace(/\/$/, '');
 const canonical = pageKey ? `${siteUrl}${pagePath(pageKey, locale)}` : undefined;
-const ogImage = `${siteUrl}/og/og-${locale}.jpg`;
+const title = Astro.props.title + tr.brandSuffix;
+const ogImage = `${siteUrl}${Astro.props.ogImage ?? `/og/og-${locale}.jpg`}`;
+const graph = jsonLd?.length ? { '@context': 'https://schema.org', '@graph': jsonLd } : undefined;
 const ogLocales = { es: 'es_ES', en: 'en_GB', de: 'de_DE' } as const;
 const analyticsToken = site.analyticsToken;
 const loadAnalytics = import.meta.env.PROD && analyticsToken.length > 0;
@@ -70,7 +78,7 @@ const loadAnalytics = import.meta.env.PROD && analyticsToken.length > 0;
     <meta property="og:image" content={ogImage} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content={tr.meta.ogAlt} />
+    {!Astro.props.ogImage && <meta property="og:image:alt" content={tr.meta.ogAlt} />}
     <meta property="og:locale" content={ogLocales[locale]} />
     {
       locales
@@ -81,23 +89,13 @@ const loadAnalytics = import.meta.env.PROD && analyticsToken.length > 0;
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
-    <meta name="twitter:image:alt" content={tr.meta.ogAlt} />
+    {!Astro.props.ogImage && <meta name="twitter:image:alt" content={tr.meta.ogAlt} />}
 
-    {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+    {graph && <script type="application/ld+json" set:html={JSON.stringify(graph)} />}
 
     <script is:inline>
       document.documentElement.classList.add('js');
     </script>
-
-    {/* Marcado visual de datos provisionales: solo en `astro dev`, nunca en producción */}
-    {
-      import.meta.env.DEV && (
-        <style
-          is:inline
-          set:html=".todo-v2{outline:2px dashed #c2185b;outline-offset:2px;background:rgba(255,214,0,.28);text-decoration:underline dashed #c2185b}"
-        />
-      )
-    }
 
     {
       loadAnalytics && (
@@ -116,8 +114,8 @@ const loadAnalytics = import.meta.env.PROD && analyticsToken.length > 0;
     <main id="main" tabindex="-1">
       <slot />
     </main>
-    <Footer pageKey={pageKey} />
-    <FloatingWhatsApp />
+    <Footer pageKey={pageKey} showRoutes={!isHome} />
+    <FloatingWhatsApp message={waMessage} />
     <script>
       import '../scripts/reveal';
     </script>

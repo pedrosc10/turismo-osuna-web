@@ -1,7 +1,6 @@
 ---
 import Photo from '../Photo.astro';
 import Icon from '../Icon.astro';
-import Todo from '../Todo.astro';
 import { t, asLocale } from '../../i18n';
 import { site, whatsappUrl, telUrl } from '../../data/site';
 
@@ -40,21 +39,25 @@ const tr = t(locale);
         </a>
         <a class="textlink" href={telUrl}>
           <Icon name="phone" class="hero__phone-icon" />
-          <span>{tr.cta.call} · <Todo>{site.phoneDisplay}</Todo></span>
+          <span>{tr.cta.call} · {site.phoneDisplay}</span>
         </a>
       </div>
 
-      <p class="hero__langs">
-        <span class="hero__langs-codes" aria-hidden="true">ES · EN · DE · IT</span>
-        <span>{tr.hero.languages}</span>
-      </p>
+      <ul class="hero__badges">
+        <li class="hero__langs-codes">
+          <span aria-hidden="true">{tr.hero.badges[0]}</span>
+          <span class="visually-hidden">{tr.hero.badgesLabel}</span>
+        </li>
+        <li>{tr.hero.badges[1]}</li>
+        <li>{tr.hero.badges[2]}</li>
+      </ul>
     </div>
   </div>
 </section>
 
 <style>
   .hero {
-    padding: 20px 0 56px;
+    padding: 16px 0 28px;
   }
   .hero__grid {
     display: grid;
@@ -68,7 +71,7 @@ const tr = t(locale);
   }
   .hero__media :global(.hero__picture) {
     display: block;
-    aspect-ratio: 4 / 4.4;
+    aspect-ratio: 16 / 10;
     background: var(--stone-2);
   }
   .hero__media :global(.hero__img) {
@@ -80,7 +83,7 @@ const tr = t(locale);
   .hero__text {
     position: relative;
     z-index: 2;
-    margin-top: -64px;
+    margin-top: -56px;
     padding-top: 0;
   }
   .hero__text .kicker {
@@ -94,7 +97,7 @@ const tr = t(locale);
     line-height: 0.98;
     font-weight: 360;
     letter-spacing: -0.025em;
-    margin: 0 0 24px;
+    margin: 0 0 18px;
     font-variation-settings: 'SOFT' 30, 'WONK' 0;
   }
   .hero__line {
@@ -111,7 +114,9 @@ const tr = t(locale);
   }
   .hero__lead {
     max-width: 36rem;
-    margin-bottom: 28px;
+    margin-bottom: 20px;
+    font-size: 1.1rem;
+    line-height: 1.45;
   }
   .hero__actions {
     display: flex;
@@ -129,16 +134,35 @@ const tr = t(locale);
     width: 20px;
     height: 20px;
   }
-  .hero__langs {
-    display: flex;
-    flex-wrap: wrap;
+  /* Móvil: idiomas a la izquierda y los dos distintivos apilados a la derecha (sin separadores huérfanos) */
+  .hero__badges {
+    display: grid;
+    grid-template-columns: auto 1fr;
     align-items: baseline;
-    gap: 4px 14px;
-    margin: 32px 0 0;
-    padding-top: 14px;
+    list-style: none;
+    gap: 2px 16px;
+    margin: 20px 0 0;
+    padding-top: 12px;
     border-top: 1px solid var(--rule);
-    font-size: 0.95rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    line-height: 1.35;
     color: var(--ink-2);
+  }
+  .hero__badges .hero__langs-codes {
+    grid-row: 1 / 3;
+  }
+  @media (min-width: 48rem) {
+    .hero__badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2px 0;
+    }
+    .hero__badges li + li::before {
+      content: '·';
+      margin: 0 12px;
+      color: var(--rule);
+    }
   }
   .hero__langs-codes {
     font-family: var(--serif);
@@ -202,12 +226,14 @@ const tr = t(locale);
       padding: 0 24px 8px 0;
     }
     .hero__lead,
-    .hero__actions,
-    .hero__langs {
+    .hero__actions {
       max-width: 30rem;
     }
-    .hero__langs {
-      max-width: 34rem;
+    .hero__lead {
+      font-size: var(--step-1);
+    }
+    .hero__badges {
+      max-width: 36rem;
     }
   }
 </style>

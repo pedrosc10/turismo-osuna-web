@@ -1,0 +1,46 @@
+---
+/**
+ * «Con la colaboración del Ayuntamiento de Osuna». DESACTIVADO (site.showCouncilCredit = false)
+ * a petición de la clienta: de momento no se pone logo ni texto. Si el Ayuntamiento lo pide:
+ *   1. pon showCouncilCredit a true en src/data/site.ts;
+ *   2. sustituye el recuadro por el logotipo oficial que facilite el Ayuntamiento
+ *      (<img src="/ayuntamiento.svg" alt="Ayuntamiento de Osuna" width=… height=…>), sin imitar su escudo.
+ */
+import { t, asLocale } from '../i18n';
+const tr = t(asLocale(Astro.currentLocale));
+---
+
+<div class="council">
+  <div class="council__logo" role="img" aria-label={tr.footer.councilPlaceholder}>
+    <span aria-hidden="true">{tr.footer.councilPlaceholder}</span>
+  </div>
+  <p>{tr.footer.council}</p>
+</div>
+
+<style>
+  .council {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 28px;
+    max-width: 22rem;
+  }
+  .council__logo {
+    display: grid;
+    place-items: center;
+    width: 180px;
+    aspect-ratio: 16 / 9;
+    border: 1px dashed var(--night-mute);
+    padding: 12px;
+    text-align: center;
+    font-size: 0.72rem;
+    line-height: 1.3;
+    color: var(--night-mute);
+  }
+  .council p {
+    color: var(--night-ink);
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 1.05rem;
+  }
+</style>

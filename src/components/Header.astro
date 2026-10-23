@@ -16,12 +16,10 @@ const home = pagePath('home', locale);
 const anchor = (id: string) => (isHome ? `#${id}` : `${home}#${id}`);
 
 const items = [
-  { id: 'rutas', label: tr.nav.routes },
-  { id: 'a-medida', label: tr.nav.custom },
-  { id: 'galeria', label: tr.nav.gallery },
-  { id: 'faq', label: tr.nav.faq },
-  { id: 'encuentro', label: tr.nav.map },
-  { id: 'contacto', label: tr.nav.contact },
+  { href: anchor('rutas'), label: tr.nav.routes, current: false },
+  { href: pagePath('custom', locale), label: tr.nav.custom, current: pageKey === 'custom' },
+  { href: pagePath('faq', locale), label: tr.nav.faq, current: pageKey === 'faq' },
+  { href: anchor('contacto'), label: tr.nav.contact, current: false },
 ];
 ---
 
@@ -36,7 +34,7 @@ const items = [
         {
           items.map((item, i) => (
             <li>
-              <a href={anchor(item.id)} data-nav-link>
+              <a href={item.href} aria-current={item.current ? 'page' : undefined} data-nav-link>
                 <span class="site-nav__num" aria-hidden="true">
                   {String(i + 1).padStart(2, '0')}
                 </span>
@@ -227,11 +225,17 @@ const items = [
     .site-nav__list a:hover {
       color: var(--terra);
     }
+    .site-nav__list a[aria-current] {
+      text-decoration: underline;
+      text-decoration-color: var(--terra);
+      text-decoration-thickness: 2px;
+      text-underline-offset: 0.4em;
+    }
     .site-nav__num {
       display: none;
     }
   }
-  @media (min-width: 64rem) and (max-width: 80rem) {
+  @media (min-width: 64rem) and (max-width: 72rem) {
     .site-nav__list a {
       padding-inline: 7px;
       font-size: 0.9rem;

@@ -1,0 +1,11 @@
+---
+import RoutePage from '../../../components/pages/RoutePage.astro';
+import { routeStaticPaths } from '../../../i18n/pages.mjs';
+
+export function getStaticPaths() {
+  return routeStaticPaths('en');
+}
+const { id } = Astro.props;
+---
+
+<RoutePage id={id} />

@@ -1,15 +1,28 @@
 ---
 import Base from '../../layouts/Base.astro';
-import { t, asLocale } from '../../i18n';
+import Breadcrumbs from '../Breadcrumbs.astro';
+import { t, asLocale, pagePath } from '../../i18n';
 import { credits } from '../../data/credits';
+import { breadcrumbNode, webPageNode, type Crumb } from '../../lib/seo';
 
-const tr = t(asLocale(Astro.currentLocale));
+const locale = asLocale(Astro.currentLocale);
+const tr = t(locale);
 const c = tr.credits;
+const siteUrl = (Astro.site?.toString() ?? '').replace(/\/$/, '');
+const crumbs: Crumb[] = [
+  { name: tr.nav.home, key: 'home' },
+  { name: c.title, key: 'credits' },
+];
+const jsonLd = [
+  webPageNode(siteUrl, `${siteUrl}${pagePath('credits', locale)}`, c.metaTitle, c.metaDesc, tr.locale),
+  breadcrumbNode(siteUrl, locale, crumbs),
+];
 ---
 
-<Base title={c.metaTitle} description={c.metaDesc} pageKey="credits">
+<Base title={c.metaTitle} description={c.metaDesc} pageKey="credits" jsonLd={jsonLd}>
   <article class="wrap grid credits-page">
     <header class="credits-page__head">
+      <Breadcrumbs crumbs={crumbs} />
       <p class="kicker">{tr.footer.credits}</p>
       <h1>{c.title}</h1>
       <p class="lead">{c.intro}</p>
@@ -65,7 +78,7 @@ const c = tr.credits;
 
 <style>
   .credits-page {
-    padding-top: 56px;
+    padding-top: 16px;
     padding-bottom: 104px;
   }
   .credits-page__head,
@@ -109,7 +122,7 @@ const c = tr.credits;
   }
   @media (min-width: 64rem) {
     .credits-page {
-      padding-top: 96px;
+      padding-top: 32px;
     }
     .credits-page__head {
       grid-column: 1 / 8;

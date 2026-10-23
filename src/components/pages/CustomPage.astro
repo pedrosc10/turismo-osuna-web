@@ -1,0 +1,344 @@
+---
+/** Página «Visitas a medida»: grupos, colegios y empresas. Textos en i18n → customPage. */
+import Base from '../../layouts/Base.astro';
+import Breadcrumbs from '../Breadcrumbs.astro';
+import Photo from '../Photo.astro';
+import Icon from '../Icon.astro';
+import Azulejo from '../Azulejo.astro';
+import FaqList from '../FaqList.astro';
+import RouteRows from '../RouteRows.astro';
+import { t, asLocale, pagePath } from '../../i18n';
+import { site, whatsappUrl, telUrl } from '../../data/site';
+import { breadcrumbNode, faqNode, providerRef, webPageNode, type Crumb } from '../../lib/seo';
+
+const locale = asLocale(Astro.currentLocale);
+const tr = t(locale);
+const c = tr.customPage;
+const f = tr.facts;
+const siteUrl = (Astro.site?.toString() ?? '').replace(/\/$/, '');
+const pageUrl = `${siteUrl}${pagePath('custom', locale)}`;
+const crumbs: Crumb[] = [
+  { name: tr.nav.home, key: 'home' },
+  { name: c.kicker, key: 'custom' },
+];
+const ordered = [...site.tourLanguages].sort((a, b) => Number(b === locale) - Number(a === locale));
+const languages = tr.list(ordered.map((l) => tr.tourLangs[l]));
+const facts = [
+  [f.group, f.groupValue],
+  [f.duration, f.durationValue],
+  [f.languages, languages.charAt(0).toUpperCase() + languages.slice(1)],
+  [f.tickets, f.ticketsValue],
+  [f.price, f.priceValue],
+  [f.meeting, f.meetingValue],
+  [f.guide, f.guideValue],
+];
+
+const jsonLd = [
+  webPageNode(siteUrl, pageUrl, c.metaTitle, c.metaDesc, tr.locale),
+  breadcrumbNode(siteUrl, locale, crumbs),
+  {
+    '@type': 'Service',
+    '@id': `${pageUrl}#service`,
+    name: c.h1,
+    description: c.lead,
+    serviceType: 'Guided tours',
+    url: pageUrl,
+    areaServed: { '@type': 'City', name: 'Osuna' },
+    audience: c.audiences.map((a) => ({ '@type': 'Audience', audienceType: a.t })),
+    provider: providerRef(siteUrl, locale),
+  },
+  faqNode(`${pageUrl}#faq`, c.faq, tr.locale),
+];
+---
+
+<Base title={c.metaTitle} description={c.metaDesc} pageKey="custom" jsonLd={jsonLd} waMessage={tr.wa.custom}>
+  <article class="cp">
+    <header class="wrap grid cp__head">
+      <div class="cp__crumbs"><Breadcrumbs crumbs={crumbs} /></div>
+      <div class="cp__intro">
+        <p class="kicker">{c.kicker}</p>
+        <h1>{c.h1}</h1>
+        <p class="lead">{c.lead}</p>
+        <div class="cp__actions">
+          <a class="btn" href={whatsappUrl(tr.wa.custom)} target="_blank" rel="noopener">
+            <Icon name="whatsapp" />
+            {tr.cta.whatsapp}
+            <span class="visually-hidden">{tr.cta.newTab}</span>
+          </a>
+          <a class="textlink" href={telUrl}>
+            <Icon name="phone" class="cp__phone-icon" />
+            <span>{tr.cta.call} · {site.phoneDisplay}</span>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <figure class="cp__band">
+      <Photo
+        name="vista-panoramica"
+        alt={tr.alt['vista-panoramica']}
+        sizes="100vw"
+        widths={[640, 960, 1440, 2000, 2400]}
+        eager
+        pictureClass="cp__band-picture"
+        class="cp__band-img"
+      />
+      <figcaption class="wrap fig">{c.caption}</figcaption>
+    </figure>
+
+    <div class="cp__panel">
+      <Azulejo id="az-custom" />
+      <div class="wrap grid cp__grid">
+        <section class="cp__who" aria-labelledby="who-title">
+          <h2 id="who-title">{c.audiencesTitle}</h2>
+          <ul class="cp__list">
+            {
+              c.audiences.map((a) => (
+                <li>
+                  <h3>{a.t}</h3>
+                  <p>{a.d}</p>
+                </li>
+              ))
+            }
+          </ul>
+        </section>
+        <section class="cp__how" aria-labelledby="how-title">
+          <h2 id="how-title">{c.howTitle}</h2>
+          <ol class="cp__steps">
+            {
+              c.how.map((step) => (
+                <li>
+                  <h3>{step.t}</h3>
+                  <p>{step.d}</p>
+                </li>
+              ))
+            }
+          </ol>
+        </section>
+      </div>
+    </div>
+
+    <div class="wrap grid cp__main">
+      <section class="cp__schools" aria-labelledby="schools-title">
+        <h2 id="schools-title">{c.schoolsTitle}</h2>
+        {c.schools.map((p) => <p>{p}</p>)}
+      </section>
+      <aside class="cp__facts" aria-labelledby="facts-title">
+        <h2 id="facts-title" class="cp__facts-title">{f.title}</h2>
+        <dl class="cartela">
+          {
+            facts.map(([dt, dd]) => (
+              <div>
+                <dt>{dt}</dt>
+                <dd>{dd}</dd>
+              </div>
+            ))
+          }
+        </dl>
+      </aside>
+      <section class="cp__faq" aria-labelledby="cp-faq-title">
+        <h2 id="cp-faq-title">{tr.faqPage.kicker}</h2>
+        <FaqList items={c.faq} name="faq-custom" />
+        <a class="textlink cp__more" href={pagePath('faq', locale)}>
+          {tr.cta.allFaq}
+          <Icon name="arrow" class="cp__arrow" />
+        </a>
+      </section>
+    </div>
+
+    <section class="wrap grid cp__routes" aria-labelledby="combine-title">
+      <div class="cp__routes-head">
+        <h2 id="combine-title">{c.combineTitle}</h2>
+      </div>
+      <RouteRows />
+    </section>
+  </article>
+</Base>
+
+<style>
+  .cp__head {
+    padding: 4px 0 32px;
+  }
+  .cp__crumbs,
+  .cp__intro {
+    grid-column: 1 / -1;
+  }
+  .cp__intro h1 {
+    font-size: clamp(2rem, 1.5rem + 2.6vw, 3.6rem);
+    font-weight: 340;
+    line-height: 1.04;
+    letter-spacing: -0.02em;
+    margin-bottom: 16px;
+    max-width: 22ch;
+    hyphens: auto;
+  }
+  .cp__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 24px;
+  }
+  .cp__actions :global(.cp__phone-icon) {
+    width: 20px;
+    height: 20px;
+  }
+  .cp__band :global(.cp__band-picture) {
+    display: block;
+    aspect-ratio: 16 / 9;
+  }
+  .cp__band :global(.cp__band-img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 40% 50%;
+  }
+  .cp__band .fig {
+    margin-bottom: 0;
+  }
+  .cp__panel {
+    --az-bg: var(--stone-2);
+    --az-star: var(--terra);
+    --az-corner: var(--olive);
+    --rule: #c5b08c;
+    background: var(--stone-2);
+    margin-top: 24px;
+  }
+  .cp__grid {
+    padding-top: 36px;
+    padding-bottom: 48px;
+    row-gap: 36px;
+  }
+  .cp__who,
+  .cp__how {
+    grid-column: 1 / -1;
+  }
+  .cp h2 {
+    font-size: var(--step-2);
+    margin-bottom: 14px;
+  }
+  .cp__list,
+  .cp__steps {
+    list-style: none;
+    border-top: 2px solid var(--ink);
+  }
+  .cp__list li,
+  .cp__steps li {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .cp__list h3,
+  .cp__steps h3 {
+    font-size: 1.2rem;
+    font-weight: 450;
+    margin-bottom: 4px;
+  }
+  .cp__list p,
+  .cp__steps p {
+    margin: 0;
+    color: var(--ink-2);
+    font-size: 0.98rem;
+  }
+  .cp__steps {
+    counter-reset: step;
+  }
+  .cp__steps li {
+    counter-increment: step;
+    display: grid;
+    grid-template-columns: 2.4rem 1fr;
+  }
+  .cp__steps li::before {
+    content: counter(step, decimal-leading-zero);
+    grid-row: 1 / 3;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: var(--terra);
+    padding-top: 0.45em;
+  }
+  .cp__main {
+    padding-top: 48px;
+    padding-bottom: 32px;
+    row-gap: 40px;
+  }
+  .cp__schools,
+  .cp__facts,
+  .cp__faq {
+    grid-column: 1 / -1;
+  }
+  .cp__schools p {
+    max-width: 40rem;
+  }
+  .cp__facts-title {
+    font-family: var(--sans);
+    font-size: 0.75rem !important;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+  .cp__more {
+    margin-top: 12px;
+  }
+  .cp :global(.cp__arrow) {
+    width: 18px;
+    height: 18px;
+  }
+  .cp__routes {
+    padding-top: 24px;
+    padding-bottom: 72px;
+  }
+  .cp__routes-head,
+  .cp__routes :global(.ri__list) {
+    grid-column: 1 / -1;
+  }
+
+  @media (min-width: 48rem) {
+    .cp__band :global(.cp__band-picture) {
+      aspect-ratio: 32 / 9;
+    }
+  }
+  @media (min-width: 64rem) {
+    .cp__head {
+      padding: 8px 0 56px;
+    }
+    .cp__intro {
+      grid-column: 1 / 10;
+    }
+    .cp__band :global(.cp__band-picture) {
+      aspect-ratio: 4 / 1;
+    }
+    .cp__grid {
+      padding-top: 72px;
+      padding-bottom: 88px;
+    }
+    .cp__who {
+      grid-column: 1 / 6;
+    }
+    .cp__how {
+      grid-column: 7 / 13;
+    }
+    .cp__main {
+      padding-top: 88px;
+      padding-bottom: 56px;
+    }
+    .cp__schools {
+      grid-column: 1 / 7;
+    }
+    .cp__facts {
+      grid-column: 8 / 13;
+      grid-row: 1 / 3;
+    }
+    .cp__faq {
+      grid-column: 1 / 7;
+    }
+    .cp__routes {
+      padding-bottom: 112px;
+    }
+    .cp__routes-head {
+      grid-column: 1 / 5;
+    }
+    .cp__routes :global(.ri__list) {
+      grid-column: 6 / 13;
+    }
+  }
+</style>

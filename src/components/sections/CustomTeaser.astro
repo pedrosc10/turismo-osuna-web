@@ -1,0 +1,86 @@
+---
+/** Bloque «Visitas a medida» del inicio: dos líneas, CTA de WhatsApp y enlace a su página. */
+import Icon from '../Icon.astro';
+import Azulejo from '../Azulejo.astro';
+import { t, asLocale, pagePath } from '../../i18n';
+import { whatsappUrl } from '../../data/site';
+
+const locale = asLocale(Astro.currentLocale);
+const tr = t(locale);
+const h = tr.home;
+---
+
+<section id="a-medida" class="ct" aria-labelledby="a-medida-title">
+  <Azulejo id="az-custom" />
+  <div class="wrap grid ct__grid">
+    <div class="ct__head">
+      <p class="kicker"><span class="num">03</span> {h.customKicker}</p>
+      <h2 id="a-medida-title">{h.customTitle}</h2>
+    </div>
+    <div class="ct__body">
+      <p>{h.customText}</p>
+      <div class="ct__actions">
+        <a class="btn" href={whatsappUrl(tr.wa.custom)} target="_blank" rel="noopener">
+          <Icon name="whatsapp" />
+          {tr.customPage.kicker}
+          <span class="visually-hidden">{tr.cta.newTab}</span>
+        </a>
+        <a class="textlink" href={pagePath('custom', locale)}>
+          {tr.cta.customPage}
+          <Icon name="arrow" class="ct__arrow" />
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .ct {
+    --az-bg: var(--stone-2);
+    --az-star: var(--terra);
+    --az-corner: var(--olive);
+    background: var(--stone-2);
+  }
+  .ct__grid {
+    padding-top: 22px;
+    padding-bottom: 28px;
+    row-gap: 8px;
+  }
+  .ct__head,
+  .ct__body {
+    grid-column: 1 / -1;
+  }
+  .ct__head h2 {
+    font-size: var(--step-2);
+  }
+  .ct__body p {
+    max-width: 38rem;
+    margin-bottom: 18px;
+  }
+  .ct__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 24px;
+  }
+  .ct__actions :global(.ct__arrow) {
+    width: 18px;
+    height: 18px;
+  }
+  @media (min-width: 64rem) {
+    .ct__grid {
+      padding-top: 56px;
+      padding-bottom: 64px;
+      align-items: end;
+    }
+    .ct__head {
+      grid-column: 1 / 6;
+    }
+    .ct__head h2 {
+      font-size: var(--step-3);
+    }
+    .ct__body {
+      grid-column: 7 / 13;
+    }
+  }
+</style>

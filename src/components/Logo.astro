@@ -4,7 +4,6 @@
  * Para sustituirlo por un logo definitivo, cambia este componente (o pon un <img src="/logo.svg">).
  */
 import { site } from '../data/site';
-import Todo from './Todo.astro';
 interface Props {
   tone?: 'ink' | 'light';
 }
@@ -18,7 +17,7 @@ const { tone = 'ink' } = Astro.props;
     <path d="M17.5 3.6h5l-.9 5.6h-3.2z" fill="var(--logo-accent)"></path>
   </svg>
   <span class="logo__text">
-    <Todo><span class="logo__name">{site.brand}</span></Todo>
+    <span class="logo__name">{site.brand}</span>
     <span class="logo__tag">{site.brandTagline} · Osuna</span>
   </span>
 </span>

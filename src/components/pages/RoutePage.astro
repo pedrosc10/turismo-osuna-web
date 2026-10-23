@@ -1,0 +1,568 @@
+---
+/**
+ * Página de una ruta (una por ruta e idioma). Todo el texto sale de i18n → routes.<id> y los datos
+ * (fotos, rutas relacionadas…) de src/data/site.ts. Ver README §«Cómo añadir una ruta».
+ */
+import { getImage } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import Base from '../../layouts/Base.astro';
+import Breadcrumbs from '../Breadcrumbs.astro';
+import Photo from '../Photo.astro';
+import Icon from '../Icon.astro';
+import FaqList from '../FaqList.astro';
+import RouteFactsSheet from '../RouteFactsSheet.astro';
+import RouteRows from '../RouteRows.astro';
+import { t, asLocale, pagePath, type PageKey } from '../../i18n';
+import { site, routeById, whatsappUrl, telUrl, type RouteId } from '../../data/site';
+import { breadcrumbNode, faqNode, providerRef, webPageNode, type Crumb } from '../../lib/seo';
+
+interface Props {
+  id: RouteId;
+}
+const { id } = Astro.props;
+const route = routeById(id);
+const locale = asLocale(Astro.currentLocale);
+const tr = t(locale);
+const rt = tr.routes[id];
+const rp = tr.routePage;
+const key: PageKey = `route-${id}`;
+const siteUrl = (Astro.site?.toString() ?? '').replace(/\/$/, '');
+const pageUrl = `${siteUrl}${pagePath(key, locale)}`;
+const book = whatsappUrl(tr.wa.route(rt.name));
+
+// Imagen para redes sociales: la foto principal recortada a 1200×630
+const photos = import.meta.glob<{ default: ImageMetadata }>('../../assets/photos/*.jpg', { eager: true });
+const og = await getImage({
+  src: photos[`../../assets/photos/${route.image}.jpg`].default,
+  width: 1200,
+  height: 630,
+  fit: 'cover',
+  format: 'jpg',
+  quality: 80,
+});
+
+const crumbs: Crumb[] = [
+  { name: tr.nav.home, key: 'home' },
+  { name: rt.shortName, key },
+];
+
+const [wide, ...rest] = route.photos;
+
+const jsonLd = [
+  { ...webPageNode(siteUrl, pageUrl, rt.metaTitle, rt.metaDesc, tr.locale), about: { '@id': `${pageUrl}#trip` } },
+  breadcrumbNode(siteUrl, locale, crumbs),
+  {
+    '@type': 'TouristTrip',
+    '@id': `${pageUrl}#trip`,
+    name: rt.name,
+    description: rt.desc,
+    url: pageUrl,
+    image: `${siteUrl}${og.src}`,
+    touristType: route.touristType,
+    itinerary: {
+      '@type': 'ItemList',
+      numberOfItems: rt.stops.length,
+      itemListElement: rt.stops.map((stop, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        item: { '@type': 'Place', name: stop, address: { '@type': 'PostalAddress', addressLocality: 'Osuna', addressCountry: 'ES' } },
+      })),
+    },
+    provider: providerRef(siteUrl, locale),
+  },
+  faqNode(`${pageUrl}#faq`, rt.faq, tr.locale),
+];
+---
+
+<Base title={rt.metaTitle} description={rt.metaDesc} pageKey={key} jsonLd={jsonLd} ogImage={og.src} waMessage={tr.wa.route(rt.name)}>
+  <article class:list={['rp', { 'rp--night': route.night }]}>
+    <header class:list={['rp__hero', { 'on-night': route.night }]}>
+      <div class="wrap grid rp__hero-grid">
+        <div class="rp__crumbs">
+          <Breadcrumbs crumbs={crumbs} tone={route.night ? 'light' : 'ink'} />
+        </div>
+        <figure class="rp__media">
+          <Photo
+            name={route.image}
+            alt={tr.alt[route.image]}
+            sizes="(min-width: 64rem) 42vw, 100vw"
+            widths={[480, 720, 960, 1280, 1600]}
+            eager
+            pictureClass={route.arch ? 'rp__picture arch' : 'rp__picture'}
+            class="rp__img"
+          />
+          <figcaption class="fig">{rt.caption}</figcaption>
+        </figure>
+        <div class="rp__intro">
+          <p class="kicker rp__kicker">
+            <span class="rp__numeral" aria-hidden="true">{route.numeral}</span>
+            {rp.kicker(route.numeral)}
+          </p>
+          <h1 class="rp__title">{rt.h1}</h1>
+          <p class="lead rp__lead">{rt.desc}</p>
+          <div class="rp__actions">
+            <a class:list={['btn', { 'btn--ochre': route.night }]} href={book} target="_blank" rel="noopener">
+              <Icon name="whatsapp" />
+              {tr.cta.bookRoute}
+              <span class="visually-hidden">{tr.cta.newTab}</span>
+            </a>
+            <a class="textlink" href={telUrl}>
+              <Icon name="phone" class="rp__phone-icon" />
+              <span>{tr.cta.call} · {site.phoneDisplay}</span>
+            </a>
+          </div>
+          <p class="rp__guide">{rp.guidedBy}</p>
+        </div>
+      </div>
+    </header>
+
+    <div class="wrap grid rp__main">
+      <aside class="rp__aside" aria-labelledby="ficha-title">
+        <RouteFactsSheet route={route} titleId="ficha-title" />
+      </aside>
+
+      <div class="rp__body">
+        {
+          rt.body.map((section, i) => (
+            <>
+              <section class="rp__section">
+                <h2>{section.h}</h2>
+                {section.p.map((para) => (
+                  <p>{para}</p>
+                ))}
+              </section>
+              {i === 0 && wide && (
+                <figure class="rp__plate rp__plate--wide reveal">
+                  <Photo
+                    name={wide}
+                    alt={tr.alt[wide]}
+                    sizes="(min-width: 64rem) 50vw, 100vw"
+                    widths={[480, 720, 960, 1280]}
+                    pictureClass="rp__plate-picture"
+                    class="rp__plate-img"
+                  />
+                </figure>
+              )}
+              {i === 1 && rest.length > 0 && (
+                <div class:list={['rp__plates', `rp__plates--${rest.length}`]}>
+                  {rest.map((name) => (
+                    <figure class="rp__plate reveal">
+                      <Photo
+                        name={name}
+                        alt={tr.alt[name]}
+                        sizes="(min-width: 64rem) 25vw, 50vw"
+                        widths={[360, 540, 720, 960]}
+                        pictureClass="rp__plate-picture"
+                        class="rp__plate-img"
+                      />
+                    </figure>
+                  ))}
+                </div>
+              )}
+            </>
+          ))
+        }
+
+        <section class="rp__section rp__stops-wrap">
+          <h2>{rp.stops}</h2>
+          <ol class="rp__stops">
+            {rt.stops.map((stop) => <li>{stop}</li>)}
+          </ol>
+        </section>
+
+        <section class="rp__family">
+          <h2>{rp.family}</h2>
+          <p>{rt.family}</p>
+        </section>
+
+        <section class="rp__faq" aria-labelledby="faq-title">
+          <h2 id="faq-title">{rp.faq}</h2>
+          <FaqList items={rt.faq} name={`faq-${id}`} />
+        </section>
+      </div>
+    </div>
+
+    <section class:list={['rp__end', { 'on-night': route.night }]} aria-labelledby="end-title">
+      <div class="wrap grid rp__end-grid">
+        <div class="rp__end-head">
+          <h2 id="end-title">{rp.endTitle}</h2>
+          <p>{rp.endText}</p>
+        </div>
+        <div class="rp__end-actions">
+          <a class:list={['btn', 'rp__end-btn', { 'btn--ochre': route.night }]} href={book} target="_blank" rel="noopener">
+            <Icon name="whatsapp" />
+            {tr.cta.bookRoute}
+            <span class="visually-hidden">{tr.cta.newTab}</span>
+          </a>
+          <a class="rp__end-phone" href={telUrl}>
+            <span class="visually-hidden">{tr.contact.phone}: </span>{site.phoneDisplay}
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="wrap grid rp__related" aria-labelledby="related-title">
+      <div class="rp__related-head">
+        <h2 id="related-title">{rp.related}</h2>
+        <a class="textlink" href={pagePath('custom', locale)}>
+          {rp.customLink}
+          <Icon name="arrow" class="rp__arrow" />
+        </a>
+      </div>
+      <RouteRows ids={route.related} />
+    </section>
+  </article>
+</Base>
+
+<style>
+  /* --- Cabecera de la ruta --- */
+  .rp__hero {
+    padding: 4px 0 40px;
+  }
+  .rp__hero.on-night {
+    background: var(--night);
+    color: var(--night-ink);
+    --rule: rgba(237, 227, 208, 0.22);
+  }
+  .rp__crumbs,
+  .rp__media,
+  .rp__intro {
+    grid-column: 1 / -1;
+  }
+  .rp__media :global(.rp__picture) {
+    display: block;
+    aspect-ratio: 4 / 3;
+    background: var(--stone-2);
+  }
+  .rp__media :global(.rp__picture.arch) {
+    aspect-ratio: 4 / 4.2;
+  }
+  .rp__media :global(.rp__img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .rp--night .rp__media :global(.rp__img) {
+    object-position: 50% 100%;
+  }
+  .on-night .fig,
+  .on-night .rp__guide {
+    color: var(--night-mute);
+  }
+  .rp__intro {
+    margin-top: 22px;
+  }
+  .rp__kicker {
+    margin-bottom: 10px;
+  }
+  .rp__kicker::before {
+    display: none;
+  }
+  .rp__numeral {
+    font-family: var(--serif);
+    font-weight: 200;
+    font-size: 2.6rem;
+    line-height: 0.8;
+    letter-spacing: -0.02em;
+    text-transform: none;
+    color: var(--olive);
+    font-variation-settings: 'SOFT' 100;
+  }
+  .on-night .rp__numeral {
+    color: var(--ochre);
+  }
+  .on-night .kicker {
+    color: var(--night-mute);
+  }
+  .rp__title {
+    font-size: clamp(2rem, 1.5rem + 2.6vw, 3.6rem);
+    font-weight: 340;
+    line-height: 1.02;
+    letter-spacing: -0.02em;
+    margin-bottom: 16px;
+    hyphens: auto;
+  }
+  .rp--night .rp__title {
+    font-style: italic;
+  }
+  .rp__lead {
+    max-width: 38rem;
+  }
+  .on-night .rp__lead {
+    color: var(--night-ink);
+  }
+  .rp__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 24px;
+    margin-top: 4px;
+  }
+  .on-night .textlink {
+    color: var(--night-ink);
+    text-decoration-color: var(--ochre);
+  }
+  .rp__actions :global(.rp__phone-icon) {
+    width: 20px;
+    height: 20px;
+  }
+  .rp__guide {
+    margin: 16px 0 0;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 0.95rem;
+    color: var(--ink-2);
+  }
+
+  /* --- Cuerpo --- */
+  .rp__main {
+    padding-top: 8px;
+    padding-bottom: 56px;
+    row-gap: 32px;
+  }
+  .rp__aside,
+  .rp__body {
+    grid-column: 1 / -1;
+  }
+  .rp__section {
+    margin-bottom: 28px;
+  }
+  .rp__body h2 {
+    font-size: var(--step-2);
+    margin-bottom: 12px;
+  }
+  .rp__body p {
+    max-width: 40rem;
+  }
+  .rp__plate {
+    margin: 4px 0 32px;
+  }
+  .rp__plate :global(.rp__plate-picture) {
+    display: block;
+    background: var(--stone-2);
+    aspect-ratio: 3 / 2;
+  }
+  .rp__plate :global(.rp__plate-img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .rp__plates {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin: 4px 0 32px;
+  }
+  .rp__plates .rp__plate {
+    margin: 0;
+  }
+  /* Encuadres variados: vertical, cuadrado y, si hay tercera, apaisada a lo ancho */
+  .rp__plates .rp__plate:nth-child(1) :global(.rp__plate-picture) {
+    aspect-ratio: 3 / 4;
+  }
+  .rp__plates .rp__plate:nth-child(2) :global(.rp__plate-picture) {
+    aspect-ratio: 1 / 1;
+    margin-top: 25%;
+  }
+  .rp__plates .rp__plate:nth-child(3) {
+    grid-column: 1 / -1;
+  }
+  .rp__plates .rp__plate:nth-child(3) :global(.rp__plate-picture) {
+    aspect-ratio: 16 / 9;
+  }
+  /* Panorámicas con mucho cielo: el encuadre baja hacia la villa */
+  .rp__plates .rp__plate:nth-child(3) :global(.rp__plate-img) {
+    object-position: 50% 80%;
+  }
+  .rp__plates--1 {
+    grid-template-columns: 1fr;
+  }
+  .rp__plates--1 .rp__plate:nth-child(1) :global(.rp__plate-picture) {
+    aspect-ratio: 16 / 9;
+  }
+
+  .rp__stops {
+    list-style: none;
+    counter-reset: stop;
+    border-top: 2px solid var(--ink);
+  }
+  .rp__stops li {
+    counter-increment: stop;
+    display: grid;
+    grid-template-columns: 2.2rem 1fr;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--rule);
+    font-family: var(--serif);
+    font-size: 1.1rem;
+  }
+  .rp__stops li::before {
+    content: counter(stop, decimal-leading-zero);
+    font-family: var(--sans);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: var(--terra);
+    padding-top: 0.3em;
+  }
+  .rp__family {
+    margin: 36px 0;
+    padding: 20px 0 4px 18px;
+    border-left: 3px solid var(--olive);
+  }
+  .rp__family h2 {
+    font-size: var(--step-1);
+  }
+  .rp__faq h2 {
+    margin-bottom: 16px;
+  }
+
+  /* --- Cierre --- */
+  .rp__end {
+    background: var(--stone-2);
+    padding: 40px 0 44px;
+  }
+  .rp__end.on-night {
+    background: var(--night);
+    color: var(--night-ink);
+  }
+  .rp__end-head,
+  .rp__end-actions {
+    grid-column: 1 / -1;
+  }
+  .rp__end h2 {
+    font-size: var(--step-3);
+    font-style: italic;
+    margin-bottom: 10px;
+  }
+  .rp__end-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px 28px;
+    margin-top: 8px;
+  }
+  .rp__end-btn {
+    min-height: 56px;
+  }
+  .rp__end-phone {
+    font-family: var(--serif);
+    font-size: clamp(1.6rem, 1.3rem + 1.5vw, 2.4rem);
+    font-weight: 330;
+    text-decoration: none;
+    border-bottom: 2px solid var(--terra);
+    white-space: nowrap;
+  }
+  .on-night .rp__end-phone {
+    border-color: var(--ochre);
+  }
+  .rp__end-phone:hover {
+    color: var(--terra);
+  }
+
+  .rp__related {
+    padding-top: 48px;
+    padding-bottom: 72px;
+  }
+  .rp__related-head,
+  .rp__related :global(.ri__list) {
+    grid-column: 1 / -1;
+  }
+  .rp__related-head h2 {
+    font-size: var(--step-2);
+    margin-bottom: 6px;
+  }
+  .rp__related-head {
+    margin-bottom: 18px;
+  }
+  .rp__related-head :global(.rp__arrow) {
+    width: 18px;
+    height: 18px;
+  }
+
+  @media (min-width: 48rem) {
+    .rp__media :global(.rp__picture) {
+      aspect-ratio: 16 / 10;
+    }
+    .rp__media :global(.rp__picture.arch) {
+      aspect-ratio: 4 / 3.6;
+      width: 78%;
+    }
+    .rp__plates {
+      gap: 14px;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .rp__hero {
+      padding: 8px 0 72px;
+    }
+    .rp__hero-grid {
+      align-items: end;
+    }
+    .rp__crumbs {
+      grid-row: 1;
+    }
+    .rp__media {
+      grid-column: 7 / 13;
+      grid-row: 2;
+    }
+    .rp__media :global(.rp__picture),
+    .rp__media :global(.rp__picture.arch) {
+      aspect-ratio: 5 / 5.6;
+      width: 100%;
+      max-height: calc(100vh - var(--header-h) - 140px);
+      min-height: 460px;
+    }
+    .rp--night .rp__media :global(.rp__picture) {
+      aspect-ratio: 5 / 4.6;
+    }
+    .rp__intro {
+      grid-column: 1 / 7;
+      grid-row: 2;
+      margin: 0;
+      padding-bottom: 40px;
+    }
+    .rp__numeral {
+      font-size: 4rem;
+    }
+    .rp__main {
+      padding-top: 24px;
+      padding-bottom: 96px;
+      column-gap: var(--gutter);
+    }
+    .rp__aside {
+      grid-column: 1 / 5;
+      position: sticky;
+      top: calc(var(--header-h) + 24px);
+      align-self: start;
+    }
+    .rp__body {
+      grid-column: 6 / 13;
+    }
+    .rp__end {
+      padding: 72px 0 80px;
+    }
+    .rp__end-grid {
+      align-items: end;
+    }
+    .rp__end-head {
+      grid-column: 1 / 7;
+    }
+    .rp__end-actions {
+      grid-column: 8 / 13;
+    }
+    .rp__related {
+      padding-top: 88px;
+      padding-bottom: 112px;
+    }
+    .rp__related-head {
+      grid-column: 1 / 5;
+      position: sticky;
+      top: calc(var(--header-h) + 32px);
+      align-self: start;
+    }
+    .rp__related :global(.ri__list) {
+      grid-column: 6 / 13;
+    }
+  }
+</style>

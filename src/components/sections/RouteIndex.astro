@@ -1,0 +1,58 @@
+---
+/**
+ * Rutas en el inicio, en formato compacto: un índice de guía impresa (numeral romano, nombre,
+ * una frase y una miniatura) que lleva a la página de cada ruta. La VII rompe en azul noche.
+ * Ver DESIGN.md §11.
+ */
+import RouteRows from '../RouteRows.astro';
+import { t, asLocale } from '../../i18n';
+
+const locale = asLocale(Astro.currentLocale);
+const tr = t(locale);
+const h = tr.home;
+---
+
+<section id="rutas" class="ri" aria-labelledby="rutas-title">
+  <div class="wrap grid ri__grid">
+    <header class="ri__head">
+      <p class="kicker"><span class="num">02</span> {h.routesKicker}</p>
+      <h2 id="rutas-title">{h.routesTitle}</h2>
+      <p class="ri__intro">{h.routesIntro}</p>
+    </header>
+
+    <RouteRows />
+  </div>
+</section>
+
+<style>
+  .ri {
+    padding: 28px 0 36px;
+  }
+  .ri__head,
+  .ri :global(.ri__list) {
+    grid-column: 1 / -1;
+  }
+  .ri__head h2 {
+    font-size: var(--step-3);
+    max-width: 17ch;
+  }
+  .ri__intro {
+    margin: 8px 0 16px;
+    color: var(--ink-2);
+    max-width: 30rem;
+  }
+  @media (min-width: 64rem) {
+    .ri {
+      padding: 96px 0 104px;
+    }
+    .ri__head {
+      grid-column: 1 / 5;
+      position: sticky;
+      top: calc(var(--header-h) + 32px);
+      align-self: start;
+    }
+    .ri :global(.ri__list) {
+      grid-column: 6 / 13;
+    }
+  }
+</style>

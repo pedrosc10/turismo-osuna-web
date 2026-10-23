@@ -1,0 +1,263 @@
+---
+/** Contacto + punto de encuentro en una sola sección compacta (mapa Leaflet + OpenStreetMap, sin cookies). */
+import Icon from '../Icon.astro';
+import { t, asLocale } from '../../i18n';
+import { site, whatsappUrl, telUrl, directionsUrl } from '../../data/site';
+
+const tr = t(asLocale(Astro.currentLocale));
+const c = tr.contact;
+const h = tr.home;
+const mp = site.meetingPoint;
+---
+
+<section id="contacto" class="visit" aria-labelledby="contacto-title">
+  <div class="visit__grid">
+    <div class="visit__text">
+      <p class="kicker"><span class="num">06</span> {h.visitKicker}</p>
+      <h2 id="contacto-title">{h.visitTitle}</h2>
+      <p>{h.visitText}</p>
+
+      <div class="visit__ways">
+        <a class="btn visit__wa" href={whatsappUrl(tr.wa.general)} target="_blank" rel="noopener">
+          <Icon name="whatsapp" />
+          {c.whatsappAction}
+          <span class="visually-hidden">{tr.cta.newTab}</span>
+        </a>
+        <a class="visit__phone" href={telUrl}>
+          <span class="visually-hidden">{c.phone}: </span>{site.phoneDisplay}
+        </a>
+      </div>
+
+      <dl class="cartela visit__facts">
+        <div>
+          <dt>{c.meeting}</dt>
+          <dd>
+            <address>{tr.facts.meetingValue} · {mp.postalCode} {mp.locality}</address>
+            <a class="visit__dir" href={directionsUrl} target="_blank" rel="noopener">
+              {c.directions}
+              <Icon name="external" class="visit__ext" />
+              <span class="visually-hidden">{tr.cta.newTab}</span>
+            </a>
+          </dd>
+        </div>
+        <div>
+          <dt>{c.hours}</dt>
+          <dd>
+            <ul>
+              {
+                site.contactHours.map((hr) => (
+                  <li>
+                    {tr.days[hr.days as keyof typeof tr.days]}: <span class="visit__hours">{hr.hours}</span>
+                  </li>
+                ))
+              }
+            </ul>
+          </dd>
+        </div>
+        <div>
+          <dt>{c.guide}</dt>
+          <dd>{tr.facts.guideValue}</dd>
+        </div>
+      </dl>
+    </div>
+
+    <div class="visit__map-wrap">
+      <div
+        class="visit__map"
+        role="region"
+        aria-label={c.mapLabel}
+        data-map
+        data-lat={mp.lat}
+        data-lng={mp.lng}
+        data-label={`${c.marker}: ${mp.name}`}
+      >
+        <noscript><p class="visit__noscript">{c.noscript}</p></noscript>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .visit {
+    border-top: 1px solid var(--rule);
+  }
+  .visit__grid {
+    display: grid;
+  }
+  .visit__text {
+    padding: 32px var(--margin) 24px;
+  }
+  .visit__text h2 {
+    font-size: var(--step-3);
+    margin-bottom: 10px;
+  }
+  .visit__ways {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 24px;
+    margin: 14px 0 18px;
+  }
+  .visit__wa {
+    min-height: 52px;
+  }
+  .visit__phone {
+    font-family: var(--serif);
+    font-size: clamp(1.6rem, 1.3rem + 1.5vw, 2.4rem);
+    font-weight: 330;
+    line-height: 1.1;
+    text-decoration: none;
+    border-bottom: 2px solid var(--terra);
+    white-space: nowrap;
+  }
+  .visit__phone:hover {
+    color: var(--terra);
+  }
+  .visit__facts {
+    grid-template-columns: 7.5rem 1fr;
+  }
+  .visit__facts dt {
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
+  .visit__facts address {
+    font-style: normal;
+  }
+  .visit__facts ul {
+    list-style: none;
+  }
+  .visit__hours {
+    white-space: nowrap;
+  }
+  .visit__dir {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 40px;
+    font-weight: 600;
+    text-decoration-color: var(--terra);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.25em;
+  }
+  .visit__text :global(.visit__ext) {
+    width: 16px;
+    height: 16px;
+  }
+  .visit__map-wrap {
+    position: relative;
+    background: var(--stone-2);
+    min-height: 176px;
+  }
+  .visit__map {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+  .visit__noscript {
+    padding: 24px var(--margin);
+  }
+
+  /* Marcador propio en forma de arco (sin imágenes de Leaflet) */
+  :global(.meet-pin) {
+    width: 34px !important;
+    height: 42px !important;
+    margin-left: -17px !important;
+    margin-top: -42px !important;
+    background: var(--terra);
+    border-radius: 999px 999px 0 0;
+    box-shadow: 0 0 0 3px var(--paper);
+  }
+  :global(.meet-pin::after) {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: -9px;
+    width: 2px;
+    height: 9px;
+    background: var(--ink);
+    transform: translateX(-50%);
+  }
+  :global(.visit .leaflet-container) {
+    font-family: var(--sans);
+    background: var(--stone-2);
+  }
+  :global(.visit .leaflet-control-attribution) {
+    font-size: 0.72rem;
+    background: rgba(250, 246, 238, 0.92);
+    color: var(--ink);
+  }
+  :global(.visit .leaflet-control-attribution a) {
+    color: var(--ink);
+  }
+  :global(.visit .leaflet-bar a) {
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    border-radius: 0;
+    color: var(--ink);
+  }
+  :global(.visit .leaflet-bar) {
+    border-radius: 0;
+    border: 1.5px solid var(--ink);
+  }
+
+  @media (min-width: 48rem) {
+    .visit__facts {
+      grid-template-columns: 11rem 1fr;
+    }
+    .visit__map-wrap {
+      min-height: 340px;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .visit__grid {
+      grid-template-columns: 6fr 6fr;
+      min-height: 600px;
+    }
+    .visit__text {
+      padding: 96px 56px 96px var(--margin);
+      max-width: 44rem;
+      justify-self: end;
+      width: 100%;
+    }
+  }
+</style>
+
+<script>
+  import leafletCss from 'leaflet/dist/leaflet.css?url';
+  const el = document.querySelector<HTMLElement>('[data-map]');
+  if (el) {
+    const init = async () => {
+      // La hoja de estilos de Leaflet se carga solo cuando hace falta (no bloquea el primer render)
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = leafletCss;
+      document.head.append(link);
+      const { default: L } = await import('leaflet');
+      const lat = Number(el.dataset.lat);
+      const lng = Number(el.dataset.lng);
+      const map = L.map(el, { scrollWheelZoom: false, zoomControl: true }).setView([lat, lng], 17);
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+      }).addTo(map);
+      const icon = L.divIcon({ className: 'meet-pin', iconSize: [34, 42] });
+      L.marker([lat, lng], { icon, title: el.dataset.label, alt: el.dataset.label, keyboard: false }).addTo(map);
+    };
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver(
+        (entries) => {
+          if (entries.some((e) => e.isIntersecting)) {
+            io.disconnect();
+            init();
+          }
+        },
+        { rootMargin: '400px' },
+      );
+      io.observe(el);
+    } else {
+      init();
+    }
+  }
+</script>

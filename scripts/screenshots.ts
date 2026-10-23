@@ -1,28 +1,36 @@
 /**
- * Capturas de página completa con Playwright: 3 idiomas × 4 anchos → reports/screenshots/.
+ * Capturas de página completa con Playwright → reports/v2/screenshots/.
+ * Por defecto: inicio y una página de ruta, en los 3 idiomas, a 375, 768, 1280 y 1920 px.
+ * Además mide la altura del inicio en móvil (375 × 812) y detecta desbordamientos horizontales.
  * Requiere el servidor de vista previa en marcha (npm run preview) en PREVIEW_URL (por defecto http://localhost:4321).
- * Uso: npm run screenshots
+ * Uso: npm run screenshots [-- filtro]   (filtro opcional: parte del nombre, p. ej. "de" o "ruta")
  */
-import { mkdir } from 'node:fs/promises';
+import { mkdir, writeFile } from 'node:fs/promises';
 import { chromium } from 'playwright';
 
 const base = process.env.PREVIEW_URL ?? 'http://localhost:4321';
+const out = 'reports/v2/screenshots';
 const widths = [375, 768, 1280, 1920];
-const pages = [
-  ['es', '/'],
-  ['en', '/en/'],
-  ['de', '/de/'],
+const pages: [string, string][] = [
+  ['es-inicio', '/'],
+  ['en-inicio', '/en/'],
+  ['de-inicio', '/de/'],
+  ['es-ruta-colegiata', '/rutas/colegiata-sepulcro-ducal/'],
+  ['en-ruta-colegiata', '/en/tours/collegiate-church-ducal-tomb/'],
+  ['de-ruta-colegiata', '/de/fuehrungen/stiftskirche-herzogsgruft/'],
 ];
-const only = process.argv[2]; // opcional: "de" para un solo idioma
+const only = process.argv[2];
+const PHONE_H = 812; // alto de pantalla de referencia (iPhone X/11/12/13 mini…)
 
-await mkdir('reports/screenshots', { recursive: true });
+await mkdir(out, { recursive: true });
 const browser = await chromium.launch({ channel: process.env.PW_CHANNEL ?? 'chrome' });
 const problems: string[] = [];
+const heights: string[] = [];
 
-for (const [lang, path] of pages) {
-  if (only && only !== lang) continue;
+for (const [name, path] of pages) {
+  if (only && !name.includes(only)) continue;
   for (const width of widths) {
-    const page = await browser.newPage({ viewport: { width, height: 900 }, deviceScaleFactor: 1 });
+    const page = await browser.newPage({ viewport: { width, height: width < 768 ? PHONE_H : 900 }, deviceScaleFactor: 1 });
     await page.goto(base + path, { waitUntil: 'networkidle' });
     // Fuerza la carga de imágenes diferidas, del mapa y de las apariciones
     await page.evaluate(async () => {
@@ -35,25 +43,28 @@ for (const [lang, path] of pages) {
     });
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(400);
-    // Desbordamiento horizontal
     const overflow = await page.evaluate(() => {
       const w = document.documentElement.clientWidth;
-      const out: string[] = [];
+      const res: string[] = [];
       document.querySelectorAll<HTMLElement>('body *').forEach((el) => {
         const r = el.getBoundingClientRect();
         if (r.width > 0 && (r.right > w + 1 || r.left < -1) && getComputedStyle(el).position !== 'fixed') {
           if (!el.closest('.leaflet-container') && !el.closest('.visually-hidden')) {
-            out.push(`${el.tagName.toLowerCase()}.${[...el.classList].join('.')} → ${Math.round(r.left)}..${Math.round(r.right)} (vp ${w})`);
+            res.push(`${el.tagName.toLowerCase()}.${[...el.classList].join('.')} → ${Math.round(r.left)}..${Math.round(r.right)} (vp ${w})`);
           }
         }
       });
-      return { scrollW: document.documentElement.scrollWidth, w, out: out.slice(0, 8) };
+      return { scrollW: document.documentElement.scrollWidth, w, out: res.slice(0, 8), h: document.documentElement.scrollHeight };
     });
-    if (overflow.scrollW > overflow.w || overflow.out.length) problems.push(`${lang} @${width}: scrollWidth=${overflow.scrollW} ${overflow.out.join(' | ')}`);
-    await page.screenshot({ path: `reports/screenshots/${lang}-${width}.png`, fullPage: true });
-    console.log(`${lang}-${width}.png`);
+    if (overflow.scrollW > overflow.w || overflow.out.length) problems.push(`${name} @${width}: scrollWidth=${overflow.scrollW} ${overflow.out.join(' | ')}`);
+    if (width === 375) heights.push(`| ${name} | ${overflow.h} px | ${(overflow.h / PHONE_H).toFixed(1)} |`);
+    await page.screenshot({ path: `${out}/${name}-${width}.png`, fullPage: true });
+    console.log(`${name}-${width}.png  (alto ${overflow.h} px)`);
     await page.close();
   }
 }
 await browser.close();
+const table = `| Página | Alto a 375 px | Pantallas de ${PHONE_H} px |\n|---|---|---|\n${heights.join('\n')}\n`;
+if (!only) await writeFile(`${out}/ALTURAS.md`, `# Altura de las páginas en móvil\n\n${table}`);
+console.log(table);
 console.log(problems.length ? 'Posibles desbordamientos:\n' + problems.join('\n') : 'Sin desbordamientos horizontales.');

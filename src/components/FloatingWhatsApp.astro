@@ -2,12 +2,17 @@
 import Icon from './Icon.astro';
 import { t, asLocale } from '../i18n';
 import { whatsappUrl } from '../data/site';
+interface Props {
+  /** Mensaje prerrellenado; por defecto, el general. */
+  message?: string;
+}
 const tr = t(asLocale(Astro.currentLocale));
+const message = Astro.props.message ?? tr.wa.general;
 ---
 
 <a
   class="wa-float"
-  href={whatsappUrl(tr.wa.general)}
+  href={whatsappUrl(message)}
   target="_blank"
   rel="noopener"
   aria-label={`${tr.cta.floating} ${tr.cta.newTab}`}
